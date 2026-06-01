@@ -406,6 +406,8 @@ function PRToast({ message, color, onDone }) {
 function ProteinTab() {
   const [entries,setEntries]=useState(()=>ls("protein_entries",{}));
   const [manualG,setManualG]=useState(""),[manualName,setManualName]=useState(""),[view,setView]=useState("today");
+  const [editingHistoryKey,setEditingHistoryKey]=useState(null);
+  const [historyDateInput,setHistoryDateInput]=useState("");
   const todayKey=getLocalDateKey();
   const todayEntries=entries[todayKey]||[];
   const todayTotal=todayEntries.reduce((s,e)=>s+e.protein,0);
@@ -417,6 +419,19 @@ function ProteinTab() {
   };
   const addManual=()=>{ const g=parseInt(manualG); if(!g||g<=0)return; addEntry(manualName.trim()||"Custom food",g); setManualG("");setManualName(""); };
   const deleteEntry=id=>saveEntries({ ...entries,[todayKey]:(entries[todayKey]||[]).filter(e=>e.id!==id) });
+  const startEditingHistoryDate=key=>{ setEditingHistoryKey(key); setHistoryDateInput(key); };
+  const cancelEditingHistoryDate=()=>{ setEditingHistoryKey(null); setHistoryDateInput(""); };
+  const saveHistoryDateChange=oldKey=>{
+    const newKey=historyDateInput.trim();
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(newKey)) return;
+    if(newKey===oldKey){ cancelEditingHistoryDate(); return; }
+    const movedEntries=entries[oldKey]||[];
+    if(!movedEntries.length){ cancelEditingHistoryDate(); return; }
+    const updated={ ...entries,[newKey]:[...(entries[newKey]||[]),...movedEntries] };
+    delete updated[oldKey];
+    saveEntries(updated);
+    cancelEditingHistoryDate();
+  };
   const streak=calcProteinStreak(entries);
   const barColor=pct>=100?"#4ade80":pct>=70?"#e8ff47":"#47c8ff";
   const last7=Array.from({length:7},(_,i)=>{
@@ -506,6 +521,8 @@ function ProteinTab() {
           {last7.map(({key,label,total})=>{
             const p=Math.min(100,(total/PROTEIN_GOAL)*100);
             const c=p>=100?"#4ade80":p>=70?"#e8ff47":p>0?"#47c8ff":"#333";
+            const hasEntries=(entries[key]||[]).length>0;
+            const isEditing=editingHistoryKey===key;
             return (
               <div key={key} className="p-4 rounded-2xl" style={{ background:"#111",border:`1px solid ${c}20` }}>
                 <div className="flex justify-between items-center mb-2">
@@ -518,6 +535,19 @@ function ProteinTab() {
                 <div className="body-text text-xs mt-1" style={{ color:"rgba(255,255,255,0.2)" }}>
                   {total===0?"Not logged":p>=100?"Goal hit checkmark":`${PROTEIN_GOAL-total}g short`}
                 </div>
+                {hasEntries&&!isEditing&&(
+                  <button onClick={()=>startEditingHistoryDate(key)} className="set-btn body-text text-xs mt-2 px-2.5 py-1 rounded-lg" style={{ color:"#47c8ff",border:"1px solid #47c8ff40" }}>
+                    Edit date
+                  </button>
+                )}
+                {hasEntries&&isEditing&&(
+                  <div className="mt-2 flex gap-2">
+                    <input type="date" value={historyDateInput} onChange={e=>setHistoryDateInput(e.target.value)}
+                      style={{ background:"#1a1a1a",border:"1px solid #333",color:"white",borderRadius:8,padding:"6px 8px",fontFamily:"'DM Sans',sans-serif",fontSize:12,flex:1 }}/>
+                    <button onClick={()=>saveHistoryDateChange(key)} className="set-btn body-text text-xs px-2.5 py-1 rounded-lg" style={{ color:"#4ade80",border:"1px solid #4ade8040" }}>Save</button>
+                    <button onClick={cancelEditingHistoryDate} className="set-btn body-text text-xs px-2.5 py-1 rounded-lg" style={{ color:"rgba(255,255,255,0.4)",border:"1px solid rgba(255,255,255,0.15)" }}>Cancel</button>
+                  </div>
+                )}
               </div>
             );
           })}

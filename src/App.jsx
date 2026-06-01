@@ -408,6 +408,7 @@ function ProteinTab() {
   const [manualG,setManualG]=useState(""),[manualName,setManualName]=useState(""),[view,setView]=useState("today");
   const [editingHistoryKey,setEditingHistoryKey]=useState(null);
   const [historyDateInput,setHistoryDateInput]=useState("");
+  const [historyDateError,setHistoryDateError]=useState("");
   const todayKey=getLocalDateKey();
   const todayEntries=entries[todayKey]||[];
   const todayTotal=todayEntries.reduce((s,e)=>s+e.protein,0);
@@ -419,15 +420,23 @@ function ProteinTab() {
   };
   const addManual=()=>{ const g=parseInt(manualG); if(!g||g<=0)return; addEntry(manualName.trim()||"Custom food",g); setManualG("");setManualName(""); };
   const deleteEntry=id=>saveEntries({ ...entries,[todayKey]:(entries[todayKey]||[]).filter(e=>e.id!==id) });
-  const startEditingHistoryDate=key=>{ setEditingHistoryKey(key); setHistoryDateInput(key); };
-  const cancelEditingHistoryDate=()=>{ setEditingHistoryKey(null); setHistoryDateInput(""); };
+  const startEditingHistoryDate=key=>{ setEditingHistoryKey(key); setHistoryDateInput(key); setHistoryDateError(""); };
+  const cancelEditingHistoryDate=()=>{ setEditingHistoryKey(null); setHistoryDateInput(""); setHistoryDateError(""); };
   const saveHistoryDateChange=oldKey=>{
     const newKey=historyDateInput.trim();
-    if(!/^\d{4}-\d{2}-\d{2}$/.test(newKey)) return;
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(newKey)){ setHistoryDateError("Use format YYYY-MM-DD."); return; }
     if(newKey===oldKey){ cancelEditingHistoryDate(); return; }
     const movedEntries=entries[oldKey]||[];
     if(!movedEntries.length){ cancelEditingHistoryDate(); return; }
-    const updated={ ...entries,[newKey]:[...(entries[newKey]||[]),...movedEntries] };
+    const existingEntries=entries[newKey]||[];
+    const usedIds=new Set(existingEntries.map(e=>e.id));
+    const uniqueMovedEntries=movedEntries.map((entry,idx)=>{
+      let nextId=entry.id;
+      while(usedIds.has(nextId)) nextId=Date.now()+idx+usedIds.size;
+      usedIds.add(nextId);
+      return nextId===entry.id?entry:{ ...entry,id:nextId };
+    });
+    const updated={ ...entries,[newKey]:[...existingEntries,...uniqueMovedEntries] };
     delete updated[oldKey];
     saveEntries(updated);
     cancelEditingHistoryDate();
@@ -541,11 +550,14 @@ function ProteinTab() {
                   </button>
                 )}
                 {hasEntries&&isEditing&&(
-                  <div className="mt-2 flex gap-2">
-                    <input type="date" value={historyDateInput} onChange={e=>setHistoryDateInput(e.target.value)}
+                  <div className="mt-2">
+                    <div className="flex gap-2">
+                      <input type="date" value={historyDateInput} onChange={e=>{ setHistoryDateInput(e.target.value); setHistoryDateError(""); }}
                       style={{ background:"#1a1a1a",border:"1px solid #333",color:"white",borderRadius:8,padding:"6px 8px",fontFamily:"'DM Sans',sans-serif",fontSize:12,flex:1 }}/>
-                    <button onClick={()=>saveHistoryDateChange(key)} className="set-btn body-text text-xs px-2.5 py-1 rounded-lg" style={{ color:"#4ade80",border:"1px solid #4ade8040" }}>Save</button>
-                    <button onClick={cancelEditingHistoryDate} className="set-btn body-text text-xs px-2.5 py-1 rounded-lg" style={{ color:"rgba(255,255,255,0.4)",border:"1px solid rgba(255,255,255,0.15)" }}>Cancel</button>
+                      <button onClick={()=>saveHistoryDateChange(key)} className="set-btn body-text text-xs px-2.5 py-1 rounded-lg" style={{ color:"#4ade80",border:"1px solid #4ade8040" }}>Save</button>
+                      <button onClick={cancelEditingHistoryDate} className="set-btn body-text text-xs px-2.5 py-1 rounded-lg" style={{ color:"rgba(255,255,255,0.4)",border:"1px solid rgba(255,255,255,0.15)" }}>Cancel</button>
+                    </div>
+                    {historyDateError&&<div className="body-text text-xs mt-1" style={{ color:"#ff6b35" }}>{historyDateError}</div>}
                   </div>
                 )}
               </div>

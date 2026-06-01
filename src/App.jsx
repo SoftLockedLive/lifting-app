@@ -430,9 +430,10 @@ function ProteinTab() {
     if(!movedEntries.length){ cancelEditingHistoryDate(); return; }
     const existingEntries=entries[newKey]||[];
     const usedIds=new Set(existingEntries.map(e=>e.id));
+    let fallbackId=Date.now()*1000;
     const uniqueMovedEntries=movedEntries.map((entry,idx)=>{
       let nextId=entry.id;
-      while(usedIds.has(nextId)) nextId=Date.now()+idx+usedIds.size;
+      while(usedIds.has(nextId)) nextId=fallbackId++;
       usedIds.add(nextId);
       return nextId===entry.id?entry:{ ...entry,id:nextId };
     });
@@ -552,7 +553,7 @@ function ProteinTab() {
                 {hasEntries&&isEditing&&(
                   <div className="mt-2">
                     <div className="flex gap-2">
-                      <input type="date" value={historyDateInput} onChange={e=>{ setHistoryDateInput(e.target.value); setHistoryDateError(""); }}
+                      <input aria-label="Edit history date" type="date" value={historyDateInput} onChange={e=>{ setHistoryDateInput(e.target.value); setHistoryDateError(""); }}
                       style={{ background:"#1a1a1a",border:"1px solid #333",color:"white",borderRadius:8,padding:"6px 8px",fontFamily:"'DM Sans',sans-serif",fontSize:12,flex:1 }}/>
                       <button onClick={()=>saveHistoryDateChange(key)} className="set-btn body-text text-xs px-2.5 py-1 rounded-lg" style={{ color:"#4ade80",border:"1px solid #4ade8040" }}>Save</button>
                       <button onClick={cancelEditingHistoryDate} className="set-btn body-text text-xs px-2.5 py-1 rounded-lg" style={{ color:"rgba(255,255,255,0.4)",border:"1px solid rgba(255,255,255,0.15)" }}>Cancel</button>

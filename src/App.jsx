@@ -406,6 +406,9 @@ function PRToast({ message, color, onDone }) {
 function ProteinTab() {
   const [entries,setEntries]=useState(()=>ls("protein_entries",{}));
   const [manualG,setManualG]=useState(""),[manualName,setManualName]=useState(""),[view,setView]=useState("today");
+  const [editingHistoryKey,setEditingHistoryKey]=useState(null);
+  const [historyDateInput,setHistoryDateInput]=useState("");
+  const [historyDateError,setHistoryDateError]=useState("");
   const todayKey=getLocalDateKey();
   const todayEntries=entries[todayKey]||[];
   const todayTotal=todayEntries.reduce((s,e)=>s+e.protein,0);
@@ -417,6 +420,30 @@ function ProteinTab() {
   };
   const addManual=()=>{ const g=parseInt(manualG); if(!g||g<=0)return; addEntry(manualName.trim()||"Custom food",g); setManualG("");setManualName(""); };
   const deleteEntry=id=>saveEntries({ ...entries,[todayKey]:(entries[todayKey]||[]).filter(e=>e.id!==id) });
+  const startEditingHistoryDate=key=>{ setEditingHistoryKey(key); setHistoryDateInput(key); setHistoryDateError(""); };
+  const cancelEditingHistoryDate=()=>{ setEditingHistoryKey(null); setHistoryDateInput(""); setHistoryDateError(""); };
+  const saveHistoryDateChange=oldKey=>{
+    const newKey=historyDateInput.trim();
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(newKey)){ setHistoryDateError("Use format YYYY-MM-DD."); return; }
+    const parsedDate=new Date(`${newKey}T00:00:00`);
+    if(Number.isNaN(parsedDate.getTime())||getLocalDateKey(parsedDate)!==newKey){ setHistoryDateError("Enter a real calendar date."); return; }
+    if(newKey===oldKey){ cancelEditingHistoryDate(); return; }
+    const movedEntries=entries[oldKey]||[];
+    if(!movedEntries.length){ cancelEditingHistoryDate(); return; }
+    const existingEntries=entries[newKey]||[];
+    const usedIds=new Set(existingEntries.map(e=>e.id));
+    let nextAvailableId=Math.max(Date.now()*1000,...usedIds)+1;
+    const uniqueMovedEntries=movedEntries.map(entry=>{
+      let nextId=entry.id;
+      while(usedIds.has(nextId)) nextId=nextAvailableId++;
+      usedIds.add(nextId);
+      return nextId===entry.id?entry:{ ...entry,id:nextId };
+    });
+    const updated={ ...entries,[newKey]:[...existingEntries,...uniqueMovedEntries] };
+    delete updated[oldKey];
+    saveEntries(updated);
+    cancelEditingHistoryDate();
+  };
   const streak=calcProteinStreak(entries);
   const barColor=pct>=100?"#4ade80":pct>=70?"#e8ff47":"#47c8ff";
   const last7=Array.from({length:7},(_,i)=>{
@@ -506,6 +533,8 @@ function ProteinTab() {
           {last7.map(({key,label,total})=>{
             const p=Math.min(100,(total/PROTEIN_GOAL)*100);
             const c=p>=100?"#4ade80":p>=70?"#e8ff47":p>0?"#47c8ff":"#333";
+            const hasEntries=(entries[key]||[]).length>0;
+            const isEditing=editingHistoryKey===key;
             return (
               <div key={key} className="p-4 rounded-2xl" style={{ background:"#111",border:`1px solid ${c}20` }}>
                 <div className="flex justify-between items-center mb-2">
@@ -516,8 +545,25 @@ function ProteinTab() {
                   <div style={{ width:`${p}%`,height:"100%",background:c,borderRadius:9999 }}/>
                 </div>
                 <div className="body-text text-xs mt-1" style={{ color:"rgba(255,255,255,0.2)" }}>
-                  {total===0?"Not logged":p>=100?"Goal hit checkmark":`${PROTEIN_GOAL-total}g short`}
+                  {total===0?"Not logged":p>=100?"Goal achieved!":`${PROTEIN_GOAL-total}g short`}
                 </div>
+                {hasEntries&&!isEditing&&(
+                  <button onClick={()=>startEditingHistoryDate(key)} className="set-btn body-text text-xs mt-2 px-2.5 py-1 rounded-lg" style={{ color:"#47c8ff",border:"1px solid #47c8ff40" }}>
+                    Edit date
+                  </button>
+                )}
+                {hasEntries&&isEditing&&(
+                  <div className="mt-2">
+                    <label htmlFor={`history-date-${key}`} className="body-text text-xs block mb-1" style={{ color:"rgba(255,255,255,0.4)" }}>Correct date</label>
+                    <div className="flex gap-2">
+                      <input id={`history-date-${key}`} type="date" value={historyDateInput} onChange={e=>{ setHistoryDateInput(e.target.value); setHistoryDateError(""); }}
+                      style={{ background:"#1a1a1a",border:"1px solid #333",color:"white",borderRadius:8,padding:"6px 8px",fontFamily:"'DM Sans',sans-serif",fontSize:12,flex:1 }}/>
+                      <button onClick={()=>saveHistoryDateChange(key)} className="set-btn body-text text-xs px-2.5 py-1 rounded-lg" style={{ color:"#4ade80",border:"1px solid #4ade8040" }}>Save</button>
+                      <button onClick={cancelEditingHistoryDate} className="set-btn body-text text-xs px-2.5 py-1 rounded-lg" style={{ color:"rgba(255,255,255,0.4)",border:"1px solid rgba(255,255,255,0.15)" }}>Cancel</button>
+                    </div>
+                    {historyDateError&&<div className="body-text text-xs mt-1" style={{ color:"#ff6b35" }}>{historyDateError}</div>}
+                  </div>
+                )}
               </div>
             );
           })}

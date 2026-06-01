@@ -174,7 +174,6 @@ const DEFAULT_DAYS = [
     id:"B", label:"DAY 2", name:"LOWER A - Squat Focus", tag:"Depth + Strength", color:"#ff6b35",
     timing:{ total:"60-70 min", compound_rest:210, accessory_rest:90 },
     exercises:[
-      { name:"Goblet Squat (Depth Work)", sets:"3 x 8", weight:"40-50 lb dumbbell", note:"FIRST - find your depth before touching barbell.", category:"mobility" },
       { name:"Barbell Back Squat", sets:"4 x 4-5", weight:"Start at 225 lb - earn depth before adding weight", note:"Film yourself from the side. Hit parallel every rep.", category:"main", trackPR:true },
       { name:"Romanian Deadlift (RDL)", sets:"3 x 8-10", weight:"Start at 135 lb", note:"Hamstring and glute builder. Fixes anterior pelvic tilt.", category:"main", trackPR:true },
       { name:"Leg Press", sets:"3 x 10-12", weight:"Moderate - feet high and wide", note:"Extra quad/glute volume without spinal load.", category:"secondary" },

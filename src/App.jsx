@@ -425,15 +425,17 @@ function ProteinTab() {
   const saveHistoryDateChange=oldKey=>{
     const newKey=historyDateInput.trim();
     if(!/^\d{4}-\d{2}-\d{2}$/.test(newKey)){ setHistoryDateError("Use format YYYY-MM-DD."); return; }
+    const parsedDate=new Date(`${newKey}T00:00:00`);
+    if(Number.isNaN(parsedDate.getTime())||getLocalDateKey(parsedDate)!==newKey){ setHistoryDateError("Enter a real calendar date."); return; }
     if(newKey===oldKey){ cancelEditingHistoryDate(); return; }
     const movedEntries=entries[oldKey]||[];
     if(!movedEntries.length){ cancelEditingHistoryDate(); return; }
     const existingEntries=entries[newKey]||[];
     const usedIds=new Set(existingEntries.map(e=>e.id));
-    let fallbackId=Date.now()*1000;
-    const uniqueMovedEntries=movedEntries.map((entry,idx)=>{
+    let nextAvailableId=Date.now()*1000;
+    const uniqueMovedEntries=movedEntries.map(entry=>{
       let nextId=entry.id;
-      while(usedIds.has(nextId)) nextId=fallbackId++;
+      while(usedIds.has(nextId)) nextId=nextAvailableId++;
       usedIds.add(nextId);
       return nextId===entry.id?entry:{ ...entry,id:nextId };
     });
@@ -552,8 +554,9 @@ function ProteinTab() {
                 )}
                 {hasEntries&&isEditing&&(
                   <div className="mt-2">
+                    <label htmlFor={`history-date-${key}`} className="body-text text-xs block mb-1" style={{ color:"rgba(255,255,255,0.4)" }}>Correct date</label>
                     <div className="flex gap-2">
-                      <input aria-label="Edit history date" type="date" value={historyDateInput} onChange={e=>{ setHistoryDateInput(e.target.value); setHistoryDateError(""); }}
+                      <input id={`history-date-${key}`} aria-label="Edit history date" type="date" value={historyDateInput} onChange={e=>{ setHistoryDateInput(e.target.value); setHistoryDateError(""); }}
                       style={{ background:"#1a1a1a",border:"1px solid #333",color:"white",borderRadius:8,padding:"6px 8px",fontFamily:"'DM Sans',sans-serif",fontSize:12,flex:1 }}/>
                       <button onClick={()=>saveHistoryDateChange(key)} className="set-btn body-text text-xs px-2.5 py-1 rounded-lg" style={{ color:"#4ade80",border:"1px solid #4ade8040" }}>Save</button>
                       <button onClick={cancelEditingHistoryDate} className="set-btn body-text text-xs px-2.5 py-1 rounded-lg" style={{ color:"rgba(255,255,255,0.4)",border:"1px solid rgba(255,255,255,0.15)" }}>Cancel</button>

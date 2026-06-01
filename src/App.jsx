@@ -545,7 +545,7 @@ function ProteinTab() {
                   <div style={{ width:`${p}%`,height:"100%",background:c,borderRadius:9999 }}/>
                 </div>
                 <div className="body-text text-xs mt-1" style={{ color:"rgba(255,255,255,0.2)" }}>
-                  {total===0?"Not logged":p>=100?"Goal hit checkmark":`${PROTEIN_GOAL-total}g short`}
+                  {total===0?"Not logged":p>=100?"Goal achieved!":`${PROTEIN_GOAL-total}g short`}
                 </div>
                 {hasEntries&&!isEditing&&(
                   <button onClick={()=>startEditingHistoryDate(key)} className="set-btn body-text text-xs mt-2 px-2.5 py-1 rounded-lg" style={{ color:"#47c8ff",border:"1px solid #47c8ff40" }}>
@@ -556,7 +556,7 @@ function ProteinTab() {
                   <div className="mt-2">
                     <label htmlFor={`history-date-${key}`} className="body-text text-xs block mb-1" style={{ color:"rgba(255,255,255,0.4)" }}>Correct date</label>
                     <div className="flex gap-2">
-                      <input id={`history-date-${key}`} aria-label="Edit history date" type="date" value={historyDateInput} onChange={e=>{ setHistoryDateInput(e.target.value); setHistoryDateError(""); }}
+                      <input id={`history-date-${key}`} type="date" value={historyDateInput} onChange={e=>{ setHistoryDateInput(e.target.value); setHistoryDateError(""); }}
                       style={{ background:"#1a1a1a",border:"1px solid #333",color:"white",borderRadius:8,padding:"6px 8px",fontFamily:"'DM Sans',sans-serif",fontSize:12,flex:1 }}/>
                       <button onClick={()=>saveHistoryDateChange(key)} className="set-btn body-text text-xs px-2.5 py-1 rounded-lg" style={{ color:"#4ade80",border:"1px solid #4ade8040" }}>Save</button>
                       <button onClick={cancelEditingHistoryDate} className="set-btn body-text text-xs px-2.5 py-1 rounded-lg" style={{ color:"rgba(255,255,255,0.4)",border:"1px solid rgba(255,255,255,0.15)" }}>Cancel</button>

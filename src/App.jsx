@@ -432,7 +432,7 @@ function ProteinTab() {
     if(!movedEntries.length){ cancelEditingHistoryDate(); return; }
     const existingEntries=entries[newKey]||[];
     const usedIds=new Set(existingEntries.map(e=>e.id));
-    let nextAvailableId=Date.now()*1000;
+    let nextAvailableId=Math.max(Date.now()*1000,...usedIds)+1;
     const uniqueMovedEntries=movedEntries.map(entry=>{
       let nextId=entry.id;
       while(usedIds.has(nextId)) nextId=nextAvailableId++;

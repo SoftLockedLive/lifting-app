@@ -15,7 +15,6 @@ const QUOTES = [
 
 const PROTEIN_GOAL = 155;
 
-//  Local date key (fixes UTC midnight bug) 
 function getLocalDateKey(date = new Date()) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -23,7 +22,6 @@ function getLocalDateKey(date = new Date()) {
   return `${y}-${m}-${d}`;
 }
 
-//  DOTS Score (male) 
 const DOTS_COEFFS = [-307.75076, 24.0900756, -0.1918759221, 0.0007391293, -0.000001093];
 function dotsScore(bodyweightLb, totalLb) {
   const bw = bodyweightLb * 0.453592;
@@ -45,7 +43,6 @@ function dotsRating(score) {
   return { label: "Beginner", color: "#ff6b35" };
 }
 
-//  Protein streak (uses local date, not UTC) 
 function calcProteinStreak(entries) {
   let streak = 0;
   const check = new Date();
@@ -56,7 +53,6 @@ function calcProteinStreak(entries) {
       streak++;
       check.setDate(check.getDate() - 1);
     } else if (i === 0) {
-      // today not yet hit - skip without breaking
       check.setDate(check.getDate() - 1);
     } else {
       break;
@@ -65,7 +61,6 @@ function calcProteinStreak(entries) {
   return streak;
 }
 
-//  Day-specific warm-ups 
 const WARMUPS = {
   A: {
     label: "UPPER A WARM-UP", note: "Shoulder prep + blood flow - 8 min", color: "#e8ff47",
@@ -238,7 +233,8 @@ const DEFAULT_DAYS = [
       { name:"Neck Lateral Flexion", sets:"3 x 15 each side", weight:"5 lb plate or hand resistance", note:"Do all three neck movements every session on this day.", category:"neck" },
       { name:"Wrestlers Bridge Hold", sets:"3 x 20-30 sec", weight:"Bodyweight only", note:"Most powerful neck thickness builder. End every arms day with this.", category:"neck" },
     ]
-  }  ,{
+  },
+  {
     id:"F", label:"DAY 6", name:"ZONE 2 RUN - Cardio", tag:"Aerobic Base | 20-40 min", color:"#4ade80",
     timing:{ total:"20-40 min", compound_rest:0, accessory_rest:0 },
     exercises:[
@@ -339,7 +335,6 @@ const COMPOUND_CATS = ["main","mobility"];
 function ls(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } }
 function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
 
-//  Timer 
 function InlineTimer({ duration, color, label, onDismiss }) {
   const [remaining, setRemaining] = useState(duration);
   useEffect(() => {
@@ -367,7 +362,6 @@ function InlineTimer({ duration, color, label, onDismiss }) {
   );
 }
 
-//  Set Log Modal 
 function SetLogModal({ exName, color, onSave, onSkip }) {
   const [w,setW]=useState(""), [r,setR]=useState("");
   const est = w && r ? estimate1RM(parseFloat(w), parseInt(r)) : null;
@@ -396,7 +390,6 @@ function SetLogModal({ exName, color, onSave, onSkip }) {
   );
 }
 
-//  Rename Modal 
 function RenameModal({ days, onSave, onClose }) {
   const [selDay,setSelDay]=useState(0),[selEx,setSelEx]=useState(0),[nameVal,setNameVal]=useState(days[0].exercises[0].name);
   useEffect(()=>{ setSelEx(0); setNameVal(days[selDay].exercises[0].name); },[selDay]);
@@ -426,7 +419,6 @@ function RenameModal({ days, onSave, onClose }) {
   );
 }
 
-//  PR Toast 
 function PRToast({ message, color, onDone }) {
   useEffect(() => { const t = setTimeout(onDone, 3500); return () => clearTimeout(t); }, []);
   return (
@@ -437,30 +429,89 @@ function PRToast({ message, color, onDone }) {
   );
 }
 
-//  Protein Tab 
+// ── PROTEIN TAB (single, updated version with edit support) ──
 function ProteinTab() {
   const [entries,setEntries]=useState(()=>ls("protein_entries",{}));
   const [manualG,setManualG]=useState(""),[manualName,setManualName]=useState(""),[view,setView]=useState("today");
+  const [editingId,setEditingId]=useState(null);
+  const [editG,setEditG]=useState(""),[editName,setEditName]=useState("");
+  const [expandedHistoryDay,setExpandedHistoryDay]=useState(null);
+
   const todayKey=getLocalDateKey();
   const todayEntries=entries[todayKey]||[];
   const todayTotal=todayEntries.reduce((s,e)=>s+e.protein,0);
   const pct=Math.min(100,(todayTotal/PROTEIN_GOAL)*100);
   const saveEntries=u=>{ setEntries(u); lsSet("protein_entries",u); };
+
   const addEntry=(name,protein)=>{
     const entry={ id:Date.now(),name,protein,time:new Date().toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}) };
     saveEntries({ ...entries,[todayKey]:[...(entries[todayKey]||[]),entry] });
   };
   const addManual=()=>{ const g=parseInt(manualG); if(!g||g<=0)return; addEntry(manualName.trim()||"Custom food",g); setManualG("");setManualName(""); };
-  const deleteEntry=id=>saveEntries({ ...entries,[todayKey]:(entries[todayKey]||[]).filter(e=>e.id!==id) });
+
+  const deleteEntry=(dateKey,id)=>saveEntries({ ...entries,[dateKey]:(entries[dateKey]||[]).filter(e=>e.id!==id) });
+
+  const startEdit=(entry)=>{ setEditingId(entry.id); setEditG(String(entry.protein)); setEditName(entry.name); };
+  const saveEdit=(dateKey)=>{
+    const g=parseInt(editG);
+    if(!g||g<=0){ setEditingId(null); return; }
+    const updated=(entries[dateKey]||[]).map(e=>e.id===editingId?{...e,protein:g,name:editName.trim()||e.name}:e);
+    saveEntries({...entries,[dateKey]:updated});
+    setEditingId(null);
+  };
+  const cancelEdit=()=>setEditingId(null);
+
   const streak=calcProteinStreak(entries);
   const barColor=pct>=100?"#4ade80":pct>=70?"#e8ff47":"#47c8ff";
+
   const last7=Array.from({length:7},(_,i)=>{
     const d=new Date(); d.setDate(d.getDate()-i);
     const key=getLocalDateKey(d);
     const label=i===0?"Today":i===1?"Yesterday":d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
-    const total=(entries[key]||[]).reduce((s,e)=>s+e.protein,0);
-    return {key,label,total};
+    const dayEntries=entries[key]||[];
+    const total=dayEntries.reduce((s,e)=>s+e.protein,0);
+    return {key,label,total,dayEntries};
   });
+
+  const EntryRow = ({ entry, dateKey, color }) => {
+    const isEditing = editingId === entry.id;
+    if (isEditing) {
+      return (
+        <div className="p-3 rounded-xl mb-1" style={{ background:"#1a1a1a",border:`1px solid ${color}60` }}>
+          <div className="flex gap-2 mb-2">
+            <div style={{ flex:2 }}>
+              <div className="body-text text-white/30 text-xs mb-1">Food name</div>
+              <input type="text" value={editName} onChange={e=>setEditName(e.target.value)}
+                style={{ background:"#111",border:"1px solid #444",color:"white",borderRadius:8,padding:"8px 10px",fontFamily:"'DM Sans',sans-serif",fontSize:13,width:"100%",boxSizing:"border-box" }}/>
+            </div>
+            <div style={{ width:72 }}>
+              <div className="body-text text-white/30 text-xs mb-1">Grams</div>
+              <input type="number" value={editG} onChange={e=>setEditG(e.target.value)}
+                style={{ background:"#111",border:"1px solid #444",color:"white",borderRadius:8,padding:"8px 10px",fontFamily:"'DM Sans',sans-serif",fontSize:13,width:"100%",boxSizing:"border-box" }}/>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={cancelEdit} className="set-btn body-text text-xs flex-1 py-1.5 rounded-lg" style={{ background:"transparent",border:"1px solid #444",color:"#888" }}>Cancel</button>
+            <button onClick={()=>saveEdit(dateKey)} className="set-btn body-text text-xs font-semibold flex-1 py-1.5 rounded-lg" style={{ background:color,color:"#000" }}>Save</button>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="flex items-center justify-between p-3 rounded-xl mb-1" style={{ background:"#111",border:"1px solid #1e1e1e" }}>
+        <div style={{ flex:1 }}>
+          <div className="body-text text-white text-sm font-medium">{entry.name}</div>
+          <div className="body-text text-white/30 text-xs">{entry.time}</div>
+        </div>
+        <div className="flex items-center gap-2">
+          <div style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:22,color }}>{entry.protein}g</div>
+          <button onClick={()=>startEdit(entry)} className="set-btn body-text text-xs px-2 py-1 rounded-lg" style={{ color:"rgba(255,255,255,0.3)",border:"1px solid rgba(255,255,255,0.1)" }}>edit</button>
+          <button onClick={()=>deleteEntry(dateKey,entry.id)} className="set-btn body-text text-xs px-2 py-1 rounded-lg" style={{ color:"rgba(255,255,255,0.2)",border:"1px solid rgba(255,255,255,0.08)" }}>x</button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="px-4 pt-4 pb-24">
       <div className="flex justify-between items-center mb-4">
@@ -517,42 +568,50 @@ function ProteinTab() {
           <button onClick={addManual} className="set-btn body-text text-sm font-semibold w-full py-2.5 rounded-xl" style={{ background:"#47c8ff",color:"#000" }}>+ Add to Today</button>
         </div>
         {todayEntries.length>0&&<>
-          <div className="text-xl tracking-wide mb-2">TODAY'S LOG</div>
-          <div className="space-y-2">
-            {[...todayEntries].reverse().map(entry=>(
-              <div key={entry.id} className="flex items-center justify-between p-3 rounded-xl" style={{ background:"#111",border:"1px solid #1e1e1e" }}>
-                <div>
-                  <div className="body-text text-white text-sm font-medium">{entry.name}</div>
-                  <div className="body-text text-white/30 text-xs">{entry.time}</div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:22,color:"#47c8ff" }}>{entry.protein}g</div>
-                  <button onClick={()=>deleteEntry(entry.id)} className="set-btn body-text text-xs px-2 py-1 rounded-lg" style={{ color:"rgba(255,255,255,0.2)",border:"1px solid rgba(255,255,255,0.08)" }}>x</button>
-                </div>
-              </div>
-            ))}
-          </div>
+          <div className="text-xl tracking-wide mb-2">TODAY'S LOG <span className="body-text text-xs text-white/30 normal-case font-normal">tap edit to fix entries</span></div>
+          {[...todayEntries].reverse().map(entry=>(
+            <EntryRow key={entry.id} entry={entry} dateKey={todayKey} color="#47c8ff"/>
+          ))}
         </>}
         {todayEntries.length===0&&<div className="body-text text-white/20 text-sm text-center py-8">Nothing logged yet today.</div>}
       </>}
       {view==="history"&&<>
-        <div className="text-xl tracking-wide mb-3">LAST 7 DAYS</div>
-        <div className="space-y-3">
-          {last7.map(({key,label,total})=>{
+        <div className="text-xl tracking-wide mb-3">LAST 7 DAYS <span className="body-text text-xs text-white/30 normal-case font-normal">tap a day to edit</span></div>
+        <div className="space-y-2">
+          {last7.map(({key,label,total,dayEntries})=>{
             const p=Math.min(100,(total/PROTEIN_GOAL)*100);
             const c=p>=100?"#4ade80":p>=70?"#e8ff47":p>0?"#47c8ff":"#333";
+            const isExpanded=expandedHistoryDay===key;
             return (
-              <div key={key} className="p-4 rounded-2xl" style={{ background:"#111",border:`1px solid ${c}20` }}>
-                <div className="flex justify-between items-center mb-2">
-                  <div className="body-text text-white text-sm font-medium">{label}</div>
-                  <div style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:22,color:c }}>{total}g</div>
+              <div key={key} className="rounded-2xl overflow-hidden" style={{ border:`1px solid ${c}20` }}>
+                <div className="p-4" style={{ background:"#111",cursor:"pointer" }} onClick={()=>setExpandedHistoryDay(isExpanded?null:key)}>
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="body-text text-white text-sm font-medium">{label}</div>
+                      <div className="body-text text-xs text-white/30">{isExpanded?"hide":"edit"}</div>
+                    </div>
+                    <div style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:22,color:c }}>{total}g</div>
+                  </div>
+                  <div className="w-full rounded-full overflow-hidden" style={{ background:"#222",height:4 }}>
+                    <div style={{ width:`${p}%`,height:"100%",background:c,borderRadius:9999 }}/>
+                  </div>
+                  <div className="body-text text-xs mt-1" style={{ color:"rgba(255,255,255,0.2)" }}>
+                    {total===0?"Not logged":p>=100?"Goal hit":total>0?`${PROTEIN_GOAL-total}g short`:""}
+                  </div>
                 </div>
-                <div className="w-full rounded-full overflow-hidden" style={{ background:"#222",height:4 }}>
-                  <div style={{ width:`${p}%`,height:"100%",background:c,borderRadius:9999 }}/>
-                </div>
-                <div className="body-text text-xs mt-1" style={{ color:"rgba(255,255,255,0.2)" }}>
-                  {total===0?"Not logged":p>=100?"Goal hit checkmark":`${PROTEIN_GOAL-total}g short`}
-                </div>
+                {isExpanded&&(
+                  <div className="px-3 pb-3" style={{ background:"#0d0d0d" }}>
+                    {dayEntries.length===0?(
+                      <div className="body-text text-white/20 text-xs text-center py-3">No entries for this day.</div>
+                    ):(
+                      <div className="pt-2">
+                        {[...dayEntries].reverse().map(entry=>(
+                          <EntryRow key={entry.id} entry={entry} dateKey={key} color={c==="#333"?"#47c8ff":c}/>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}
@@ -566,7 +625,7 @@ function ProteinTab() {
   );
 }
 
-//  Body Scan Tab 
+// ── BODY SCAN TAB (single version) ──
 function BodyScanTab({ onBwChange }) {
   const [scans,setScans]=useState(()=>ls("body_scans",[]));
   const [form,setForm]=useState({date:"",weight:"",muscle:"",fat:"",bodyfat:""});
@@ -678,7 +737,7 @@ function BodyScanTab({ onBwChange }) {
   );
 }
 
-//  Volume Tab 
+// ── VOLUME TAB (single version) ──
 function VolumeTab({ setLog }) {
   const getWeekStart=()=>{
     const now=new Date(), day=now.getDay();
@@ -739,7 +798,7 @@ function VolumeTab({ setLog }) {
   );
 }
 
-//  Notes Tab 
+// ── NOTES TAB (single version) ──
 function NotesTab({ days }) {
   const [notes,setNotes]=useState(()=>ls("session_notes",[]));
   const [selDay,setSelDay]=useState(0),[noteText,setNoteText]=useState(""),[rating,setRating]=useState(3);
@@ -750,7 +809,6 @@ function NotesTab({ days }) {
     saveNotes([entry,...notes]); setNoteText(""); setRating(3);
   };
   const deleteNote=id=>saveNotes(notes.filter(n=>n.id!==id));
-  const ratingEmoji={1:"skull",2:"angry",3:"flex",4:"fire",5:"bolt"};
   const ratingLabel={1:"Rough",2:"Okay",3:"Solid",4:"Great",5:"PB Day"};
   const ratingDisplay={1:"💀",2:"😤",3:"💪",4:"🔥",5:"⚡"};
   return (
@@ -806,7 +864,7 @@ function NotesTab({ days }) {
   );
 }
 
-//  Main App 
+// ── MAIN APP ──
 export default function App() {
   const [activeTab,setActiveTab]=useState(()=>sessionStorage.getItem("tab")||"home");
   const [activeDay,setActiveDay]=useState(()=>parseInt(sessionStorage.getItem("day")||"0"));
@@ -832,7 +890,6 @@ export default function App() {
   useEffect(()=>{ sessionStorage.setItem("day",String(activeDay)); },[activeDay]);
   useEffect(()=>{ sessionStorage.setItem("completedSets",JSON.stringify(completedSets)); },[completedSets]);
 
-  // Sync protein entries for streak on home tab
   useEffect(()=>{
     const iv=setInterval(()=>{ const pe=ls("protein_entries",null); if(pe) setProteinEntries(pe); },3000);
     return ()=>clearInterval(iv);
@@ -867,7 +924,6 @@ export default function App() {
       const est1rm=estimate1RM(weight,reps);
       const entry={id:Date.now(),timestamp:Date.now(),weight,reps,exName,dayName:days[activeDay].name.split("-")[0].trim(),dayColor:days[activeDay].color,date:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric"}),time:new Date().toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}),est1rm};
       const updated=[entry,...setLog];
-      // PR detection
       const prevBest=setLog.filter(e=>e.exName===exName).reduce((b,e)=>(e.est1rm||0)>(b.est1rm||0)?e:b,{est1rm:0});
       if(est1rm&&est1rm>(prevBest.est1rm||0)&&prevBest.est1rm>0){
         setPrToast({message:`${exName}: est. 1RM ${est1rm} lb`,color:days[activeDay].color});
@@ -904,7 +960,6 @@ export default function App() {
   const dotsRat=dotsRating(dots);
   const proteinStreak=calcProteinStreak(proteinEntries);
 
-  // Deload: 16+ logged days in last 28 days
   const sessionDays=new Set(setLog.filter(e=>e.timestamp&&Date.now()-e.timestamp<28*24*3600*1000).map(e=>new Date(e.timestamp).toISOString().split("T")[0]));
   const thisMonth=new Date().toISOString().slice(0,7);
   const showDeload=sessionDays.size>=16&&deloadDismissed!==thisMonth;
@@ -916,8 +971,6 @@ export default function App() {
   const tabLabels={home:"Home",program:"Program",protein:"Protein",volume:"Volume",notes:"Notes",scan:"Body Scan",logs:"Logs",prs:"PRs",nutrition:"Food",bag:"Bag"};
   const uniqueExNames=[...new Set(setLog.map(e=>e.exName))];
   const filteredLog=logFilter==="all"?setLog:setLog.filter(e=>e.exName===logFilter);
-
-  const S = (style) => style; // passthrough for inline styles
 
   return (
     <div style={{ fontFamily:"'Bebas Neue','Arial Narrow',sans-serif" }} className="min-h-screen bg-black text-white">
@@ -1009,7 +1062,6 @@ export default function App() {
             <div className="body-text text-white text-sm leading-relaxed italic mb-1">"{QUOTES[quoteIdx].text}"</div>
             <div className="body-text text-white/30 text-xs">{QUOTES[quoteIdx].context}</div>
           </div>
-
           <div className="text-xl tracking-wide mb-3">THIS WEEK</div>
           <div className="grid grid-cols-2 gap-2 mb-5">
             {WEEK_SCHEDULE.slice(0,6).map((s,i)=>(
@@ -1254,32 +1306,6 @@ export default function App() {
         </div>
       )}
 
-      {activeTab==="planner"&&(
-        <div className="px-4 pt-4 pb-24">
-          <div className="text-3xl tracking-wide mb-4">WEEKLY PLANNER</div>
-          <div className="space-y-3">
-            {WEEK_SCHEDULE.map((s,i)=>(
-              <div key={i} className="p-4 rounded-2xl" style={{ background:"#111",border:`1px solid ${s.color}30` }}>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="text-2xl tracking-wide" style={{ color:s.color }}>{s.day.toUpperCase()}</div>
-                      {s.bodyScan&&<span className="body-text text-xs px-2 py-0.5 rounded-full" style={{ background:"#47c8ff20",color:"#47c8ff" }}>BODY SCAN</span>}
-                    </div>
-                    <div className="body-text text-white text-sm font-medium">{s.label}</div>
-                    <div className="body-text text-white/30 text-xs">Work: {s.work}</div>
-                  </div>
-                  <div className="body-text text-xs px-2 py-1 rounded-full" style={{ background:s.type==="lift"?"#e8ff4715":s.type==="cardio"?"#4ade8015":"#ffffff08",color:s.type==="lift"?"#e8ff47":s.type==="cardio"?"#4ade80":"#444" }}>{s.type.toUpperCase()}</div>
-                </div>
-                {s.type==="lift"&&(
-                  <button onClick={()=>{ setActiveDay(s.dayIdx); setActiveTab("program"); }} className="set-btn body-text text-xs mt-3 px-4 py-1.5 rounded-full" style={{ background:s.color+"20",color:s.color,border:`1px solid ${s.color}40` }}>Open Day</button>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {activeTab==="nutrition"&&(
         <div className="px-4 pt-4 pb-24">
           <div className="text-3xl tracking-wide mb-5">NUTRITION</div>
@@ -1307,39 +1333,6 @@ export default function App() {
         </div>
       )}
 
-      {activeTab==="cardio"&&(
-        <div className="px-4 pt-4 pb-24">
-          <div className="text-3xl tracking-wide mb-4">CARDIO</div>
-          <div className="space-y-3">
-            {cardioWeeks.map((w,i)=>(
-              <div key={i} className="p-4 rounded-2xl" style={{ background:"#111",border:"1px solid #4ade8020" }}>
-                <div className="flex justify-between items-start gap-2 mb-1">
-                  <div className="text-lg tracking-wide" style={{ color:"#4ade80" }}>{w.phase.toUpperCase()}</div>
-                  <div className="body-text text-xs px-2 py-1 rounded-full" style={{ background:"#4ade8015",color:"#4ade80" }}>{w.duration}</div>
-                </div>
-                <div className="body-text text-white text-sm font-medium">{w.type}</div>
-                <div className="body-text text-white/30 text-xs mt-1">{w.note}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {activeTab==="sleep"&&(
-        <div className="px-4 pt-4 pb-24">
-          <div className="text-3xl tracking-wide mb-4">SLEEP</div>
-          <div className="space-y-3">
-            {sleepProtocol.map((s,i)=>(
-              <div key={i} className="p-4 rounded-2xl" style={{ background:"#111",border:"1px solid #222" }}>
-                <div className="text-lg tracking-wide" style={{ color:"#47c8ff" }}>{s.time.toUpperCase()}</div>
-                <div className="body-text text-white font-medium mt-1 text-sm">{s.action}</div>
-                <div className="body-text text-white/40 text-xs mt-1">{s.note}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {activeTab==="bag"&&(
         <div className="px-4 pt-4 pb-24">
           <div className="text-3xl tracking-wide mb-4">GYM BAG</div>
@@ -1357,455 +1350,6 @@ export default function App() {
               </div>
             ))}
           </div>
-        </div>
-      )}
-
-      {activeTab==="rules"&&(
-        <div className="px-4 pt-4 pb-24">
-          <div className="text-3xl tracking-wide mb-5">PROGRESSION RULES</div>
-          <div className="space-y-3">
-            {progressionRules.map((rule,i)=>(
-              <div key={i} className="flex gap-3 p-4 rounded-2xl" style={{ background:"#111",border:"1px solid #222" }}>
-                <div className="text-2xl font-bold shrink-0" style={{ color:"#e8ff47",fontFamily:"'Bebas Neue',sans-serif" }}>{String(i+1).padStart(2,"0")}</div>
-                <div className="body-text text-white/70 text-sm leading-relaxed self-center">{rule}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}//  Protein Tab 
-function ProteinTab() {
-  const [entries,setEntries]=useState(()=>ls("protein_entries",{}));
-  const [manualG,setManualG]=useState(""),[manualName,setManualName]=useState(""),[view,setView]=useState("today");
-  const [editingId,setEditingId]=useState(null);
-  const [editG,setEditG]=useState(""),[editName,setEditName]=useState("");
-  // For history editing - which day is expanded
-  const [expandedHistoryDay,setExpandedHistoryDay]=useState(null);
-
-  const todayKey=getLocalDateKey();
-  const todayEntries=entries[todayKey]||[];
-  const todayTotal=todayEntries.reduce((s,e)=>s+e.protein,0);
-  const pct=Math.min(100,(todayTotal/PROTEIN_GOAL)*100);
-  const saveEntries=u=>{ setEntries(u); lsSet("protein_entries",u); };
-
-  const addEntry=(name,protein)=>{
-    const entry={ id:Date.now(),name,protein,time:new Date().toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}) };
-    saveEntries({ ...entries,[todayKey]:[...(entries[todayKey]||[]),entry] });
-  };
-  const addManual=()=>{ const g=parseInt(manualG); if(!g||g<=0)return; addEntry(manualName.trim()||"Custom food",g); setManualG("");setManualName(""); };
-
-  const deleteEntry=(dateKey,id)=>saveEntries({ ...entries,[dateKey]:(entries[dateKey]||[]).filter(e=>e.id!==id) });
-
-  const startEdit=(entry)=>{ setEditingId(entry.id); setEditG(String(entry.protein)); setEditName(entry.name); };
-  const saveEdit=(dateKey)=>{
-    const g=parseInt(editG);
-    if(!g||g<=0){ setEditingId(null); return; }
-    const updated=(entries[dateKey]||[]).map(e=>e.id===editingId?{...e,protein:g,name:editName.trim()||e.name}:e);
-    saveEntries({...entries,[dateKey]:updated});
-    setEditingId(null);
-  };
-  const cancelEdit=()=>setEditingId(null);
-
-  const streak=calcProteinStreak(entries);
-  const barColor=pct>=100?"#4ade80":pct>=70?"#e8ff47":"#47c8ff";
-
-  const last7=Array.from({length:7},(_,i)=>{
-    const d=new Date(); d.setDate(d.getDate()-i);
-    const key=getLocalDateKey(d);
-    const label=i===0?"Today":i===1?"Yesterday":d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
-    const dayEntries=entries[key]||[];
-    const total=dayEntries.reduce((s,e)=>s+e.protein,0);
-    return {key,label,total,dayEntries};
-  });
-
-  const EntryRow = ({ entry, dateKey, color }) => {
-    const isEditing = editingId === entry.id;
-    if (isEditing) {
-      return (
-        <div className="p-3 rounded-xl mb-1" style={{ background:"#1a1a1a",border:`1px solid ${color}60` }}>
-          <div className="flex gap-2 mb-2">
-            <div style={{ flex:2 }}>
-              <div className="body-text text-white/30 text-xs mb-1">Food name</div>
-              <input type="text" value={editName} onChange={e=>setEditName(e.target.value)}
-                style={{ background:"#111",border:"1px solid #444",color:"white",borderRadius:8,padding:"8px 10px",fontFamily:"'DM Sans',sans-serif",fontSize:13,width:"100%",boxSizing:"border-box" }}/>
-            </div>
-            <div style={{ width:72 }}>
-              <div className="body-text text-white/30 text-xs mb-1">Grams</div>
-              <input type="number" value={editG} onChange={e=>setEditG(e.target.value)}
-                style={{ background:"#111",border:"1px solid #444",color:"white",borderRadius:8,padding:"8px 10px",fontFamily:"'DM Sans',sans-serif",fontSize:13,width:"100%",boxSizing:"border-box" }}/>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <button onClick={cancelEdit} className="set-btn body-text text-xs flex-1 py-1.5 rounded-lg" style={{ background:"transparent",border:"1px solid #444",color:"#888" }}>Cancel</button>
-            <button onClick={()=>saveEdit(dateKey)} className="set-btn body-text text-xs font-semibold flex-1 py-1.5 rounded-lg" style={{ background:color,color:"#000" }}>Save</button>
-          </div>
-        </div>
-      );
-    }
-    return (
-      <div className="flex items-center justify-between p-3 rounded-xl mb-1" style={{ background:"#111",border:"1px solid #1e1e1e" }}>
-        <div style={{ flex:1 }}>
-          <div className="body-text text-white text-sm font-medium">{entry.name}</div>
-          <div className="body-text text-white/30 text-xs">{entry.time}</div>
-        </div>
-        <div className="flex items-center gap-2">
-          <div style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:22,color }}>{entry.protein}g</div>
-          <button onClick={()=>startEdit(entry)} className="set-btn body-text text-xs px-2 py-1 rounded-lg" style={{ color:"rgba(255,255,255,0.3)",border:"1px solid rgba(255,255,255,0.1)" }}>edit</button>
-          <button onClick={()=>deleteEntry(dateKey,entry.id)} className="set-btn body-text text-xs px-2 py-1 rounded-lg" style={{ color:"rgba(255,255,255,0.2)",border:"1px solid rgba(255,255,255,0.08)" }}>x</button>
-        </div>
-      </div>
-    );
-  };
-
-  return (
-    <div className="px-4 pt-4 pb-24">
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <div className="text-3xl tracking-wide">PROTEIN</div>
-          {streak>0&&<div className="body-text text-xs mt-0.5" style={{ color:"#4ade80" }}>fire {streak} day streak</div>}
-        </div>
-        <div className="flex gap-1">
-          {["today","history"].map(v=>(
-            <button key={v} onClick={()=>setView(v)} className="body-text text-xs px-3 py-1.5 rounded-full font-medium uppercase"
-              style={{ background:view===v?"#47c8ff":"#111",color:view===v?"#000":"#555",border:`1px solid ${view===v?"#47c8ff":"#333"}` }}>{v}</button>
-          ))}
-        </div>
-      </div>
-      {view==="today"&&<>
-        <div className="p-4 rounded-2xl mb-4" style={{ background:"#111",border:`1px solid ${barColor}30` }}>
-          <div className="flex items-center gap-4 mb-3">
-            <div style={{ position:"relative",width:72,height:72,flexShrink:0 }}>
-              <svg width="72" height="72" style={{ transform:"rotate(-90deg)" }}>
-                <circle cx="36" cy="36" r="30" fill="none" stroke="#222" strokeWidth="6"/>
-                <circle cx="36" cy="36" r="30" fill="none" stroke={barColor} strokeWidth="6" strokeLinecap="round"
-                  strokeDasharray={`${(pct/100)*(2*Math.PI*30)} ${2*Math.PI*30}`} style={{ transition:"stroke-dasharray 0.5s ease" }}/>
-              </svg>
-              <div style={{ position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center" }}>
-                <span style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:18,color:barColor,lineHeight:1 }}>{Math.round(pct)}%</span>
-              </div>
-            </div>
-            <div style={{ flex:1 }}>
-              <div style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:42,color:barColor,lineHeight:1 }}>{todayTotal}g</div>
-              <div className="body-text text-white/40 text-sm">of {PROTEIN_GOAL}g goal</div>
-            </div>
-          </div>
-          <div className="w-full rounded-full overflow-hidden" style={{ background:"#222",height:6,marginBottom:8 }}>
-            <div style={{ width:`${pct}%`,height:"100%",background:barColor,borderRadius:9999,transition:"width 0.4s ease" }}/>
-          </div>
-          <div className="body-text text-xs" style={{ color:todayTotal>PROTEIN_GOAL?"#4ade80":"rgba(255,255,255,0.3)" }}>
-            {todayTotal>PROTEIN_GOAL?`Goal crushed! +${todayTotal-PROTEIN_GOAL}g over`:`${Math.max(0,PROTEIN_GOAL-todayTotal)}g remaining`}
-          </div>
-        </div>
-        <div className="text-xl tracking-wide mb-2">ADD FOOD</div>
-        <div className="p-4 rounded-2xl mb-4" style={{ background:"#111",border:"1px solid #222" }}>
-          <div className="flex gap-2 mb-3">
-            <div style={{ flex:2 }}>
-              <div className="body-text text-white/30 text-xs mb-1">Food name (optional)</div>
-              <input type="text" placeholder="e.g. Chicken breast" value={manualName} onChange={e=>setManualName(e.target.value)}
-                style={{ background:"#1a1a1a",border:"1px solid #333",color:"white",borderRadius:10,padding:"10px 12px",fontFamily:"'DM Sans',sans-serif",fontSize:14,width:"100%",boxSizing:"border-box" }}/>
-            </div>
-            <div style={{ width:80 }}>
-              <div className="body-text text-white/30 text-xs mb-1">Protein (g)</div>
-              <input type="number" placeholder="40" value={manualG} onChange={e=>setManualG(e.target.value)}
-                style={{ background:"#1a1a1a",border:"1px solid #333",color:"white",borderRadius:10,padding:"10px 12px",fontFamily:"'DM Sans',sans-serif",fontSize:14,width:"100%",boxSizing:"border-box" }}/>
-            </div>
-          </div>
-          <button onClick={addManual} className="set-btn body-text text-sm font-semibold w-full py-2.5 rounded-xl" style={{ background:"#47c8ff",color:"#000" }}>+ Add to Today</button>
-        </div>
-        {todayEntries.length>0&&<>
-          <div className="text-xl tracking-wide mb-2">TODAY'S LOG <span className="body-text text-xs text-white/30 normal-case font-normal">tap edit to fix entries</span></div>
-          {[...todayEntries].reverse().map(entry=>(
-            <EntryRow key={entry.id} entry={entry} dateKey={todayKey} color="#47c8ff"/>
-          ))}
-        </>}
-        {todayEntries.length===0&&<div className="body-text text-white/20 text-sm text-center py-8">Nothing logged yet today.</div>}
-      </>}
-      {view==="history"&&<>
-        <div className="text-xl tracking-wide mb-3">LAST 7 DAYS <span className="body-text text-xs text-white/30 normal-case font-normal">tap a day to edit</span></div>
-        <div className="space-y-2">
-          {last7.map(({key,label,total,dayEntries})=>{
-            const p=Math.min(100,(total/PROTEIN_GOAL)*100);
-            const c=p>=100?"#4ade80":p>=70?"#e8ff47":p>0?"#47c8ff":"#333";
-            const isExpanded=expandedHistoryDay===key;
-            return (
-              <div key={key} className="rounded-2xl overflow-hidden" style={{ border:`1px solid ${c}20` }}>
-                <div className="p-4" style={{ background:"#111",cursor:"pointer" }} onClick={()=>setExpandedHistoryDay(isExpanded?null:key)}>
-                  <div className="flex justify-between items-center mb-2">
-                    <div className="flex items-center gap-2">
-                      <div className="body-text text-white text-sm font-medium">{label}</div>
-                      <div className="body-text text-xs text-white/30">{isExpanded?"hide":"edit"}</div>
-                    </div>
-                    <div style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:22,color:c }}>{total}g</div>
-                  </div>
-                  <div className="w-full rounded-full overflow-hidden" style={{ background:"#222",height:4 }}>
-                    <div style={{ width:`${p}%`,height:"100%",background:c,borderRadius:9999 }}/>
-                  </div>
-                  <div className="body-text text-xs mt-1" style={{ color:"rgba(255,255,255,0.2)" }}>
-                    {total===0?"Not logged":p>=100?"Goal hit":total>0?`${PROTEIN_GOAL-total}g short`:""}
-                  </div>
-                </div>
-                {isExpanded&&(
-                  <div className="px-3 pb-3" style={{ background:"#0d0d0d" }}>
-                    {dayEntries.length===0?(
-                      <div className="body-text text-white/20 text-xs text-center py-3">No entries for this day.</div>
-                    ):(
-                      <div className="pt-2">
-                        {[...dayEntries].reverse().map(entry=>(
-                          <EntryRow key={entry.id} entry={entry} dateKey={key} color={c==="  #333"?"#47c8ff":c}/>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-        <div className="mt-4 p-4 rounded-2xl" style={{ background:"#111",border:"1px solid #e8ff4725" }}>
-          <div className="text-xl tracking-wide mb-1" style={{ color:"#e8ff47" }}>YOUR GOAL</div>
-          <div className="body-text text-white/60 text-sm"><span style={{ color:"#47c8ff",fontFamily:"'Bebas Neue',sans-serif",fontSize:20 }}>155g/day</span> - InBody: 140 lb lean mass x 1.1g/lb.</div>
-        </div>
-      </>}
-    </div>
-  );
-}
-
-//  Body Scan Tab 
-function BodyScanTab({ onBwChange }) {
-  const [scans,setScans]=useState(()=>ls("body_scans",[]));
-  const [form,setForm]=useState({date:"",weight:"",muscle:"",fat:"",bodyfat:""});
-  const [adding,setAdding]=useState(false);
-  const saveScans=s=>{ setScans(s); lsSet("body_scans",s); };
-  const addScan=()=>{
-    if(!form.weight) return;
-    const entry={ id:Date.now(),date:form.date||new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),weight:parseFloat(form.weight)||null,muscle:parseFloat(form.muscle)||null,fat:parseFloat(form.fat)||null,bodyfat:parseFloat(form.bodyfat)||null };
-    const updated=[entry,...scans]; saveScans(updated);
-    if(form.weight) onBwChange(form.weight);
-    setForm({date:"",weight:"",muscle:"",fat:"",bodyfat:""}); setAdding(false);
-  };
-  const deleteScan=id=>saveScans(scans.filter(s=>s.id!==id));
-  const bwTrend=scans.filter(s=>s.weight).slice(0,8).reverse();
-  const muscleTrend=scans.filter(s=>s.muscle).slice(0,8).reverse();
-  const fields=[
-    {key:"weight",label:"Weight (lb)",placeholder:"154.8",color:"#e8ff47"},
-    {key:"muscle",label:"Skeletal Muscle (lb)",placeholder:"80.2",color:"#47c8ff"},
-    {key:"fat",label:"Body Fat (lb)",placeholder:"14.1",color:"#ff6b35"},
-    {key:"bodyfat",label:"Body Fat %",placeholder:"9.2",color:"#c47bff"},
-  ];
-  const MiniBar = ({ data, color, label }) => {
-    if (data.length < 2) return null;
-    const vals = data.map(s => s[label === "WEIGHT" ? "weight" : "muscle"]);
-    const minV = Math.min(...vals), maxV = Math.max(...vals), range = maxV - minV || 1;
-    return (
-      <div className="p-4 rounded-2xl mb-4" style={{ background:"#111",border:`1px solid ${color}25` }}>
-        <div className="text-lg tracking-wide mb-3" style={{ color }}>{label} TREND</div>
-        <div className="flex items-end gap-1.5" style={{ height:60 }}>
-          {data.map((s,i)=>{
-            const val = label === "WEIGHT" ? s.weight : s.muscle;
-            const h = Math.max(8,((val-minV)/range)*50+10);
-            return (
-              <div key={i} style={{ flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:2 }}>
-                <div style={{ width:"100%",height:h,background:color,borderRadius:3,opacity:0.6+i*0.06 }}/>
-                <div className="body-text" style={{ fontSize:8,color:"rgba(255,255,255,0.3)",textAlign:"center" }}>{val}</div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-  return (
-    <div className="px-4 pt-4 pb-24">
-      <div className="flex justify-between items-center mb-1">
-        <div className="text-3xl tracking-wide">BODY SCAN</div>
-        <button onClick={()=>setAdding(!adding)} className="set-btn body-text text-xs px-3 py-1.5 rounded-full font-semibold"
-          style={{ background:adding?"#333":"#e8ff4720",color:adding?"white":"#e8ff47",border:`1px solid ${adding?"#555":"#e8ff4740"}` }}>
-          {adding?"Cancel":"+ Log Scan"}
-        </button>
-      </div>
-      <div className="body-text text-white/30 text-xs mb-4">Log monthly - first Monday of each month</div>
-      {adding&&(
-        <div className="p-4 rounded-2xl mb-4" style={{ background:"#111",border:"1px solid #e8ff4730" }}>
-          <div className="text-xl tracking-wide mb-3" style={{ color:"#e8ff47" }}>NEW SCAN</div>
-          <div className="body-text text-white/30 text-xs mb-1">Date (optional)</div>
-          <input type="text" placeholder="Jun 2, 2025" value={form.date} onChange={e=>setForm({...form,date:e.target.value})}
-            style={{ background:"#1a1a1a",border:"1px solid #333",color:"white",borderRadius:10,padding:"10px 12px",fontFamily:"'DM Sans',sans-serif",fontSize:14,width:"100%",boxSizing:"border-box",marginBottom:12 }}/>
-          <div className="grid grid-cols-2 gap-2 mb-3">
-            {fields.map(f=>(
-              <div key={f.key}>
-                <div className="body-text text-xs mb-1" style={{ color:"rgba(255,255,255,0.3)" }}>{f.label}</div>
-                <input type="number" placeholder={f.placeholder} value={form[f.key]} onChange={e=>setForm({...form,[f.key]:e.target.value})}
-                  style={{ background:"#1a1a1a",border:`1px solid ${f.color}40`,color:"white",borderRadius:10,padding:"10px 12px",fontFamily:"'DM Sans',sans-serif",fontSize:14,width:"100%",boxSizing:"border-box" }}/>
-              </div>
-            ))}
-          </div>
-          <button onClick={addScan} className="set-btn body-text text-sm font-semibold w-full py-2.5 rounded-xl" style={{ background:"#e8ff47",color:"#000" }}>Save Scan</button>
-        </div>
-      )}
-      <MiniBar data={bwTrend} color="#e8ff47" label="WEIGHT"/>
-      <MiniBar data={muscleTrend} color="#47c8ff" label="MUSCLE"/>
-      {scans.length===0?(
-        <div className="body-text text-white/20 text-sm text-center py-12">No scans yet. Log your first Monday InBody scan.</div>
-      ):(
-        <div className="space-y-3">
-          {scans.map((scan,idx)=>{
-            const prev=scans[idx+1];
-            const diff=field=>prev&&scan[field]&&prev[field]?(scan[field]-prev[field]).toFixed(1):null;
-            return (
-              <div key={scan.id} className="p-4 rounded-2xl" style={{ background:"#111",border:"1px solid #222" }}>
-                <div className="flex justify-between items-start mb-3">
-                  <div className="text-xl tracking-wide" style={{ color:"#e8ff47" }}>{scan.date||"No date"}</div>
-                  <button onClick={()=>deleteScan(scan.id)} className="set-btn body-text text-xs px-2 py-1 rounded-lg" style={{ color:"rgba(255,255,255,0.2)",border:"1px solid rgba(255,255,255,0.08)" }}>x</button>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    {label:"Weight",val:scan.weight,unit:"lb",d:diff("weight"),color:"#e8ff47",goodUp:true},
-                    {label:"Muscle Mass",val:scan.muscle,unit:"lb",d:diff("muscle"),color:"#47c8ff",goodUp:true},
-                    {label:"Body Fat",val:scan.fat,unit:"lb",d:diff("fat"),color:"#ff6b35",goodUp:false},
-                    {label:"Body Fat %",val:scan.bodyfat,unit:"%",d:null,color:"#c47bff"},
-                  ].map(f=>(
-                    <div key={f.label} className="p-2 rounded-xl" style={{ background:"#1a1a1a" }}>
-                      <div className="body-text text-xs mb-0.5" style={{ color:"rgba(255,255,255,0.3)" }}>{f.label}</div>
-                      <div style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:20,color:f.val?f.color:"#333" }}>{f.val?`${f.val}${f.unit}`:"--"}</div>
-                      {f.d&&<div className="body-text text-xs" style={{ color:parseFloat(f.d)===0?"#555":(f.goodUp?parseFloat(f.d)>0:parseFloat(f.d)<0)?"#4ade80":"#ff4444" }}>
-                        {parseFloat(f.d)>0?"+":""}{f.d}{f.unit}
-                      </div>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
-
-//  Volume Tab 
-function VolumeTab({ setLog }) {
-  const getWeekStart=()=>{
-    const now=new Date(), day=now.getDay();
-    const d=new Date(now); d.setDate(d.getDate()-day+(day===0?-6:1)); d.setHours(0,0,0,0);
-    return d;
-  };
-  const weekStart=getWeekStart();
-  const weekLogs=setLog.filter(e=>e.timestamp&&new Date(e.timestamp)>=weekStart);
-  const muscleSets={};
-  weekLogs.forEach(entry=>{
-    (EX_MUSCLE_MAP[entry.exName]||[]).forEach(m=>{ muscleSets[m]=(muscleSets[m]||0)+1; });
-  });
-  const sorted=Object.entries(muscleSets).sort((a,b)=>b[1]-a[1]);
-  const notHit=Object.keys(RECOMMENDED_SETS).filter(m=>!muscleSets[m]);
-  return (
-    <div className="px-4 pt-4 pb-24">
-      <div className="text-3xl tracking-wide mb-1">VOLUME</div>
-      <div className="body-text text-white/30 text-xs mb-4">Sets per muscle group - this week only (resets Monday)</div>
-      {weekLogs.length===0?(
-        <div className="body-text text-white/20 text-sm text-center py-12">No sets logged this week yet.</div>
-      ):(
-        <>
-          <div className="space-y-2 mb-4">
-            {sorted.map(([muscle,sets])=>{
-              const color=MUSCLE_COLORS[muscle]||"#888";
-              const rec=RECOMMENDED_SETS[muscle]||10;
-              const pct=Math.min(100,(sets/rec)*100);
-              const status=sets>=rec?"check":sets>=(rec*0.7)?"~":"up";
-              const statusColor=sets>=rec?"#4ade80":sets>=(rec*0.7)?"#e8ff47":"#ff6b35";
-              return (
-                <div key={muscle} className="p-3 rounded-xl" style={{ background:"#111",border:`1px solid ${color}20` }}>
-                  <div className="flex justify-between items-center mb-1.5">
-                    <div className="body-text text-sm font-medium text-white">{muscle}</div>
-                    <div className="flex items-center gap-2">
-                      <div className="body-text text-xs" style={{ color:"rgba(255,255,255,0.3)" }}>{sets}/{rec} sets</div>
-                      <div className="body-text text-xs font-bold" style={{ color:statusColor }}>{status}</div>
-                    </div>
-                  </div>
-                  <div className="w-full rounded-full overflow-hidden" style={{ background:"#222",height:4 }}>
-                    <div style={{ width:`${pct}%`,height:"100%",background:color,borderRadius:9999 }}/>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          {notHit.length>0&&(
-            <div className="p-3 rounded-xl mb-4" style={{ background:"#111",border:"1px solid #ff6b3520" }}>
-              <div className="body-text text-xs text-white/40 mb-1">NOT HIT YET THIS WEEK</div>
-              <div className="body-text text-xs" style={{ color:"#ff6b35" }}>{notHit.join(" - ")}</div>
-            </div>
-          )}
-        </>
-      )}
-      <div className="p-4 rounded-2xl" style={{ background:"#111",border:"1px solid #ffffff10" }}>
-        <div className="body-text text-white/30 text-xs leading-relaxed">check = at/above recommended - ~ = 70%+ - up = needs more volume. Weekly targets for natural lifters.</div>
-      </div>
-    </div>
-  );
-}
-
-//  Notes Tab 
-function NotesTab({ days }) {
-  const [notes,setNotes]=useState(()=>ls("session_notes",[]));
-  const [selDay,setSelDay]=useState(0),[noteText,setNoteText]=useState(""),[rating,setRating]=useState(3);
-  const saveNotes=n=>{ setNotes(n); lsSet("session_notes",n); };
-  const addNote=()=>{
-    if(!noteText.trim()) return;
-    const entry={ id:Date.now(),dayId:days[selDay].id,dayName:days[selDay].name.split("-")[0].trim(),dayColor:days[selDay].color,note:noteText.trim(),rating,date:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric"}),time:new Date().toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}) };
-    saveNotes([entry,...notes]); setNoteText(""); setRating(3);
-  };
-  const deleteNote=id=>saveNotes(notes.filter(n=>n.id!==id));
-  const ratingEmoji={1:"skull",2:"angry",3:"flex",4:"fire",5:"bolt"};
-  const ratingLabel={1:"Rough",2:"Okay",3:"Solid",4:"Great",5:"PB Day"};
-  const ratingDisplay={1:"💀",2:"😤",3:"💪",4:"🔥",5:"⚡"};
-  return (
-    <div className="px-4 pt-4 pb-24">
-      <div className="text-3xl tracking-wide mb-4">SESSION NOTES</div>
-      <div className="p-4 rounded-2xl mb-4" style={{ background:"#111",border:"1px solid #222" }}>
-        <div className="text-xl tracking-wide mb-3">LOG TODAY</div>
-        <div className="flex gap-2 mb-3 overflow-x-auto pb-1" style={{ scrollbarWidth:"none" }}>
-          {days.map((d,i)=>(
-            <button key={i} onClick={()=>setSelDay(i)} className="set-btn body-text text-xs px-3 py-1.5 rounded-full font-medium whitespace-nowrap"
-              style={{ background:selDay===i?d.color+"20":"transparent",color:selDay===i?d.color:"#555",border:`1px solid ${selDay===i?d.color:"#333"}` }}>
-              {d.id} - {d.label}
-            </button>
-          ))}
-        </div>
-        <div className="body-text text-white/30 text-xs mb-2">Session rating</div>
-        <div className="flex gap-2 mb-3">
-          {[1,2,3,4,5].map(r=>(
-            <button key={r} onClick={()=>setRating(r)} className="set-btn flex-1 py-2 rounded-xl text-center"
-              style={{ background:rating===r?days[selDay].color+"30":"#1a1a1a",border:`1px solid ${rating===r?days[selDay].color:"#333"}` }}>
-              <div style={{ fontSize:16 }}>{ratingDisplay[r]}</div>
-              <div className="body-text text-xs mt-0.5" style={{ color:rating===r?days[selDay].color:"#555" }}>{ratingLabel[r]}</div>
-            </button>
-          ))}
-        </div>
-        <textarea value={noteText} onChange={e=>setNoteText(e.target.value)} placeholder="How did it feel? PR attempts? Anything to remember next time..." rows={3}
-          style={{ background:"#1a1a1a",border:"1px solid #333",color:"white",borderRadius:10,padding:"10px 12px",fontFamily:"'DM Sans',sans-serif",fontSize:14,width:"100%",boxSizing:"border-box",resize:"none",marginBottom:12 }}/>
-        <button onClick={addNote} className="set-btn body-text text-sm font-semibold w-full py-2.5 rounded-xl" style={{ background:days[selDay].color,color:"#000" }}>Save Note</button>
-      </div>
-      {notes.length===0?(
-        <div className="body-text text-white/20 text-sm text-center py-8">No notes yet. Log after each session.</div>
-      ):(
-        <div className="space-y-3">
-          {notes.map(entry=>(
-            <div key={entry.id} className="p-4 rounded-2xl" style={{ background:"#111",border:`1px solid ${entry.dayColor}25` }}>
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:entry.dayColor }}>{entry.dayName}</span>
-                    <span style={{ fontSize:16 }}>{ratingDisplay[entry.rating]}</span>
-                    <span className="body-text text-xs" style={{ color:entry.dayColor }}>{ratingLabel[entry.rating]}</span>
-                  </div>
-                  <div className="body-text text-white/30 text-xs">{entry.date} - {entry.time}</div>
-                </div>
-                <button onClick={()=>deleteNote(entry.id)} className="set-btn body-text text-xs px-2 py-1 rounded-lg" style={{ color:"rgba(255,255,255,0.2)",border:"1px solid rgba(255,255,255,0.08)" }}>x</button>
-              </div>
-              <div className="body-text text-white/70 text-sm leading-relaxed">{entry.note}</div>
-            </div>
-          ))}
         </div>
       )}
     </div>

@@ -156,7 +156,8 @@ const EX_MUSCLE_MAP = {
   "Skull Crusher": ["Triceps"],
   "Overhead Tricep Extension": ["Triceps"],
   "Seated Dumbbell Press": ["Front Delt","Triceps","Side Delt"],
-  "Tricep Pushdown (Cable)": ["Triceps"],
+  "Tricep Pushdowns": ["Triceps"],
+  "Preacher Curl": ["Biceps"],
 };
 const MUSCLE_COLORS = {
   Chest:"#e8ff47", Triceps:"#e8ff4799", "Front Delt":"#ffdd00",
@@ -180,7 +181,7 @@ const DEFAULT_DAYS = [
       { name:"Seated Dumbbell Press", sets:"3 x 8-10", weight:"Start at 2x25-30 lb. Natural wrist path.", note:"Replaces Smith machine OHP. Builds real shoulder strength and stabilizers.", category:"secondary", trackPR:true },
       { name:"Weighted Pull-Ups or Lat Pulldown", sets:"3 x 6-8", weight:"Add weight when you can do 3x8 clean", note:"Width and upper back thickness.", category:"secondary" },
       { name:"Barbell Shrug", sets:"3 x 10-12", weight:"Start at 135-185 lb, add 10 lb/week", note:"Trap thickness. Hold peak contraction 1 sec.", category:"accessory" },
-      { name:"Ab Wheel Rollout", sets:"3 x 8-10", weight:"Bodyweight", note:"Upper ab focus. Go to parallel, not floor at first.", category:"accessory" },
+      { name:"Ab Wheel Rollout", sets:"3 x 8-10", weight:"Bodyweight", note:"Upper ab focus. Go to parallel, not floor at first.", category:"ab" },
     ]
   },
   {
@@ -191,8 +192,8 @@ const DEFAULT_DAYS = [
       { name:"Romanian Deadlift (RDL)", sets:"3 x 8-10", weight:"Start at 135 lb", note:"Hamstring and glute builder. Fixes anterior pelvic tilt.", category:"main", trackPR:true },
       { name:"Leg Press", sets:"3 x 10-12", weight:"Moderate - feet high and wide", note:"Extra quad/glute volume without spinal load.", category:"secondary" },
       { name:"Leg Curl (Machine)", sets:"3 x 12", weight:"Moderate", note:"Hamstring balance. Prevents knee issues.", category:"secondary" },
-      { name:"Cable Crunch", sets:"3 x 15", weight:"Moderate", note:"Upper ab focus. Round your spine at the top.", category:"accessory" },
-      { name:"Dead Bug", sets:"3 x 8 each side", weight:"Bodyweight", note:"Reinforce bracing. Protects your lower back.", category:"accessory" },
+      { name:"Cable Crunch", sets:"3 x 15", weight:"Moderate", note:"Upper ab focus. Round your spine at the top.", category:"ab" },
+      { name:"Dead Bug", sets:"3 x 8 each side", weight:"Bodyweight", note:"Reinforce bracing. Protects your lower back.", category:"ab" },
     ]
   },
   {
@@ -204,7 +205,7 @@ const DEFAULT_DAYS = [
       { name:"Dumbbell Lateral Raise", sets:"3 x 15", weight:"Light - perfect form", note:"Shoulder width. Makes your waist look smaller.", category:"secondary" },
       { name:"Face Pull", sets:"3 x 15", weight:"Light", note:"Rear delt and rotator cuff health. Non-negotiable.", category:"secondary" },
       { name:"Skull Crusher", sets:"3 x 10-12", weight:"Start at 60-75 lb EZ bar", note:"Best direct tricep mass builder. Slow eccentric, flare elbows slightly.", category:"accessory" },
-      { name:"Hanging Leg Raise", sets:"3 x 12-15", weight:"Bodyweight", note:"Lower ab tie-in + hip flexor strength.", category:"accessory" },
+      { name:"Hanging Leg Raise", sets:"3 x 12-15", weight:"Bodyweight", note:"Lower ab tie-in + hip flexor strength.", category:"ab" },
     ]
   },
   {
@@ -224,11 +225,13 @@ const DEFAULT_DAYS = [
     timing:{ total:"45-55 min", compound_rest:90, accessory_rest:60 },
     exercises:[
       { name:"Weighted Dips", sets:"3 x 6-8", weight:"Bodyweight to start, add weight when 3x8 is clean", note:"Best compound tricep movement. Lean slightly forward for chest tie-in.", category:"main", trackPR:true },
-      { name:"Tricep Pushdown (Cable)", sets:"3 x 12-15", weight:"Moderate", note:"Full lockout every rep. Elbows stay pinned to sides.", category:"secondary" },
-      { name:"Overhead Tricep Extension", sets:"3 x 12", weight:"Light-moderate dumbbell", note:"Hits the long head. The part that makes arms look big from behind.", category:"accessory" },
-      { name:"EZ Bar Curl", sets:"3 x 10-12", weight:"Focus on full stretch at bottom", note:"Bicep peak builder. Slow eccentric (3 sec down).", category:"accessory" },
-      { name:"Incline Dumbbell Curl", sets:"2 x 12", weight:"Light - this is a stretch curl", note:"Hits the long head. This is what makes biceps POP.", category:"accessory" },
-      { name:"Hammer Curl", sets:"3 x 10-12", weight:"Moderate", note:"Brachialis builder - pushes bicep up.", category:"accessory" },
+      { name:"EZ Bar Curl", sets:"3 x 10-12", weight:"Focus on full stretch at bottom", note:"Bicep peak builder. Slow eccentric (3 sec down).", category:"accessory", altGroup:"bicep" },
+      { name:"Tricep Pushdowns", sets:"3 x 12-15", weight:"Moderate", note:"Full lockout every rep. Elbows stay pinned to sides.", category:"secondary", altGroup:"tricep" },
+      { name:"Preacher Curl", sets:"3 x 10-12", weight:"Light-moderate, focus on full ROM", note:"Peak contraction machine. Full stretch at bottom every rep.", category:"accessory", altGroup:"bicep" },
+      { name:"Overhead Tricep Extension", sets:"3 x 12", weight:"Light-moderate dumbbell", note:"Hits the long head. The part that makes arms look big from behind.", category:"accessory", altGroup:"tricep" },
+      { name:"Incline Dumbbell Curl", sets:"2 x 12", weight:"Light - this is a stretch curl", note:"Hits the long head. This is what makes biceps POP.", category:"accessory", altGroup:"bicep" },
+      { name:"Hammer Curl", sets:"3 x 10-12", weight:"Moderate", note:"Brachialis builder - pushes bicep up.", category:"accessory", altGroup:"bicep" },
+      { name:"Skull Crusher", sets:"3 x 10-12", weight:"Start at 60-75 lb EZ bar", note:"Best direct tricep mass builder. Slow eccentric, flare elbows slightly.", category:"accessory", altGroup:"tricep" },
       { name:"Neck Flexion / Extension (Plate)", sets:"3 x 15-20", weight:"5-10 lb plate", note:"Full ROM. Never go heavy.", category:"neck" },
       { name:"Neck Lateral Flexion", sets:"3 x 15 each side", weight:"5 lb plate or hand resistance", note:"Do all three neck movements every session on this day.", category:"neck" },
       { name:"Wrestlers Bridge Hold", sets:"3 x 20-30 sec", weight:"Bodyweight only", note:"Most powerful neck thickness builder. End every arms day with this.", category:"neck" },
@@ -329,6 +332,7 @@ const categoryColors = {
   accessory:{ bg:"bg-white/5", badge:"bg-white/10 text-white/60", label:"ACCESSORY" },
   mobility:{ bg:"bg-yellow-400/10", badge:"bg-yellow-400 text-black", label:"MOBILITY FIRST" },
   neck:{ bg:"bg-purple-500/10", badge:"bg-purple-500 text-white", label:"NECK" },
+  ab:{ bg:"bg-green-400/10", badge:"bg-green-400 text-black", label:"ABS" },
 };
 const COMPOUND_CATS = ["main","mobility"];
 
@@ -628,15 +632,15 @@ function ProteinTab() {
 // ── BODY SCAN TAB (single version) ──
 function BodyScanTab({ onBwChange }) {
   const [scans,setScans]=useState(()=>ls("body_scans",[]));
-  const [form,setForm]=useState({date:"",weight:"",muscle:"",fat:"",bodyfat:""});
+  const [form,setForm]=useState({date:"",weight:"",muscle:"",fat:"",bodyfat:"",age:""});
   const [adding,setAdding]=useState(false);
   const saveScans=s=>{ setScans(s); lsSet("body_scans",s); };
   const addScan=()=>{
     if(!form.weight) return;
-    const entry={ id:Date.now(),date:form.date||new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),weight:parseFloat(form.weight)||null,muscle:parseFloat(form.muscle)||null,fat:parseFloat(form.fat)||null,bodyfat:parseFloat(form.bodyfat)||null };
+    const entry={ id:Date.now(),date:form.date||new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}),weight:parseFloat(form.weight)||null,muscle:parseFloat(form.muscle)||null,fat:parseFloat(form.fat)||null,bodyfat:parseFloat(form.bodyfat)||null,age:parseInt(form.age)||null };
     const updated=[entry,...scans]; saveScans(updated);
     if(form.weight) onBwChange(form.weight);
-    setForm({date:"",weight:"",muscle:"",fat:"",bodyfat:""}); setAdding(false);
+    setForm({date:"",weight:"",muscle:"",fat:"",bodyfat:"",age:""}); setAdding(false);
   };
   const deleteScan=id=>saveScans(scans.filter(s=>s.id!==id));
   const bwTrend=scans.filter(s=>s.weight).slice(0,8).reverse();
@@ -646,6 +650,7 @@ function BodyScanTab({ onBwChange }) {
     {key:"muscle",label:"Skeletal Muscle (lb)",placeholder:"80.2",color:"#47c8ff"},
     {key:"fat",label:"Body Fat (lb)",placeholder:"14.1",color:"#ff6b35"},
     {key:"bodyfat",label:"Body Fat %",placeholder:"9.2",color:"#c47bff"},
+    {key:"age",label:"Age",placeholder:"17",color:"#4ade80"},
   ];
   const MiniBar = ({ data, color, label }) => {
     if (data.length < 2) return null;
@@ -710,7 +715,10 @@ function BodyScanTab({ onBwChange }) {
               <div key={scan.id} className="p-4 rounded-2xl" style={{ background:"#111",border:"1px solid #222" }}>
                 <div className="flex justify-between items-start mb-3">
                   <div className="text-xl tracking-wide" style={{ color:"#e8ff47" }}>{scan.date||"No date"}</div>
-                  <button onClick={()=>deleteScan(scan.id)} className="set-btn body-text text-xs px-2 py-1 rounded-lg" style={{ color:"rgba(255,255,255,0.2)",border:"1px solid rgba(255,255,255,0.08)" }}>x</button>
+                  <div className="flex items-center gap-2">
+                    {scan.age&&<div className="body-text text-xs px-2 py-0.5 rounded-full" style={{ background:"#4ade8020",color:"#4ade80" }}>Age {scan.age}</div>}
+                    <button onClick={()=>deleteScan(scan.id)} className="set-btn body-text text-xs px-2 py-1 rounded-lg" style={{ color:"rgba(255,255,255,0.2)",border:"1px solid rgba(255,255,255,0.08)" }}>x</button>
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   {[
@@ -871,6 +879,17 @@ export default function App() {
   const [completedSets,setCompletedSets]=useState(()=>{ try{return JSON.parse(sessionStorage.getItem("completedSets")||"{}");}catch{return {};} });
   const [days,setDays]=useState(DEFAULT_DAYS);
   const [bagFilter,setBagFilter]=useState("essential");
+  const [gymBagData,setGymBagData]=useState(()=>ls("gym_bag_custom",gymBag));
+  const [bagAddItem,setBagAddItem]=useState("");
+  const [bagAddNote,setBagAddNote]=useState("");
+  const [showBagAdd,setShowBagAdd]=useState(false);
+  const saveGymBag=b=>{ setGymBagData(b); lsSet("gym_bag_custom",b); };
+  const addBagItem=()=>{
+    if(!bagAddItem.trim()) return;
+    const updated={...gymBagData,[bagFilter]:[...gymBagData[bagFilter],{item:bagAddItem.trim(),note:bagAddNote.trim()}]};
+    saveGymBag(updated); setBagAddItem(""); setBagAddNote(""); setShowBagAdd(false);
+  };
+  const removeBagItem=(cat,idx)=>{ const updated={...gymBagData,[cat]:gymBagData[cat].filter((_,i)=>i!==idx)}; saveGymBag(updated); };
   const [prData,setPrData]=useState(()=>ls("pr_data",{}));
   const [prInput,setPrInput]=useState({});
   const [repInput,setRepInput]=useState({});
@@ -948,6 +967,7 @@ export default function App() {
   };
 
   const handleBwChange=val=>{ setBodyweight(val); try{localStorage.setItem("bodyweight",val);}catch(e){} };
+  const latestScanAge = (() => { try { const s = ls("body_scans",[]); return s.length && s[0].age ? s[0].age : null; } catch { return null; } })();
   const resetSets=()=>{ setCompletedSets({}); sessionStorage.removeItem("completedSets"); };
   const deleteLogEntry=id=>saveLog(setLog.filter(e=>e.id!==id));
   const parseSetCount=s=>{ const m=s.match(/^(\d+)/); return m?parseInt(m[1]):3; };
@@ -996,7 +1016,7 @@ export default function App() {
         <div className="flex justify-between items-start mb-3">
           <div>
             <h1 className="text-4xl leading-none tracking-wide" style={{ color:"#e8ff47" }}>1000LB CLUB</h1>
-            <div className="body-text text-white/40 text-xs mt-1">17yo - {bw}lb - Summer 2026</div>
+            <div className="body-text text-white/40 text-xs mt-1">{latestScanAge?`Age ${latestScanAge}`:"17yo"} - {bw}lb - Summer 2026</div>
           </div>
           <div className="text-right">
             <div className="body-text text-white/30 text-xs">Club total</div>
@@ -1062,6 +1082,23 @@ export default function App() {
             <div className="body-text text-white text-sm leading-relaxed italic mb-1">"{QUOTES[quoteIdx].text}"</div>
             <div className="body-text text-white/30 text-xs">{QUOTES[quoteIdx].context}</div>
           </div>
+          {(()=>{ const notes=ls("session_notes",[]); const latest=notes[0]; if(!latest) return null;
+            const ratingDisplay={1:"💀",2:"😤",3:"💪",4:"🔥",5:"⚡"};
+            const ratingLabel={1:"Rough",2:"Okay",3:"Solid",4:"Great",5:"PB Day"};
+            return (
+              <div className="p-4 rounded-2xl mb-4" style={{ background:"#111",border:`1px solid ${latest.dayColor}30` }}>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-2">
+                    <span style={{ fontSize:20 }}>{ratingDisplay[latest.rating]}</span>
+                    <span style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:latest.dayColor }}>{latest.dayName}</span>
+                    <span className="body-text text-xs" style={{ color:latest.dayColor }}>{ratingLabel[latest.rating]}</span>
+                  </div>
+                  <div className="body-text text-xs text-white/30">{latest.date}</div>
+                </div>
+                <div className="body-text text-white/60 text-xs leading-relaxed" style={{ display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden" }}>{latest.note}</div>
+              </div>
+            );
+          })()}
           <div className="text-xl tracking-wide mb-3">THIS WEEK</div>
           <div className="grid grid-cols-2 gap-2 mb-5">
             {WEEK_SCHEDULE.slice(0,6).map((s,i)=>(
@@ -1140,11 +1177,12 @@ export default function App() {
                 const exLogs=setLog.filter(e=>e.exName===ex.name);
                 const bestLog=exLogs.length?exLogs.reduce((b,x)=>(x.est1rm||0)>(b.est1rm||0)?x:b,exLogs[0]):null;
                 return (
-                  <div key={exIdx} className={`rounded-2xl p-4 ${cat.bg}`} style={{ border:"1px solid rgba(255,255,255,0.07)" }}>
+                  <div key={exIdx} className={`rounded-2xl p-4 ${cat.bg}`} style={{ border:`1px solid ${ex.category==="ab"?"#4ade8030":ex.category==="neck"?"#a855f730":"rgba(255,255,255,0.07)"}` }}>
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 flex-wrap mb-1">
                           <span className={`body-text text-xs px-2 py-0.5 rounded-full font-semibold ${cat.badge}`}>{cat.label}</span>
+                          {ex.altGroup&&<span className="body-text text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background:ex.altGroup==="bicep"?"#47c8ff20":"#e8ff4720",color:ex.altGroup==="bicep"?"#47c8ff":"#e8ff47" }}>{ex.altGroup==="bicep"?"BICEP":"TRICEP"}</span>}
                           {ex.trackPR&&<span className="body-text text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background:"#e8ff4720",color:"#e8ff47" }}>PR</span>}
                         </div>
                         <div className="text-xl tracking-wide" style={{ fontFamily:"'Bebas Neue',sans-serif" }}>{ex.name}</div>
@@ -1190,37 +1228,61 @@ export default function App() {
             {setLog.length>0&&<button onClick={()=>{ if(window.confirm("Clear all logs?")) saveLog([]); }} className="set-btn body-text text-xs px-3 py-1.5 rounded-full" style={{ background:"#ff444415",color:"#ff4444",border:"1px solid #ff444430" }}>Clear All</button>}
           </div>
           <div className="body-text text-white/40 text-sm mb-4">{setLog.length} sets logged total</div>
-          {setLog.length>0&&(
-            <div className="flex gap-2 mb-4 overflow-x-auto pb-1" style={{ scrollbarWidth:"none" }}>
-              <button onClick={()=>setLogFilter("all")} className="set-btn body-text text-xs px-3 py-1.5 rounded-full font-medium whitespace-nowrap" style={{ background:logFilter==="all"?"white":"#111",color:logFilter==="all"?"black":"#666",border:`1px solid ${logFilter==="all"?"white":"#333"}` }}>All</button>
-              {uniqueExNames.map(name=>(
-                <button key={name} onClick={()=>setLogFilter(name)} className="set-btn body-text text-xs px-3 py-1.5 rounded-full font-medium whitespace-nowrap" style={{ background:logFilter===name?"white":"#111",color:logFilter===name?"black":"#666",border:`1px solid ${logFilter===name?"white":"#333"}` }}>
-                  {name.length>20?name.slice(0,18)+"...":name}
-                </button>
-              ))}
-            </div>
-          )}
-          {filteredLog.length===0?<div className="body-text text-white/20 text-sm text-center py-12">{setLog.length===0?"No sets logged yet.":"No sets for this exercise."}</div>:(
-            <div className="space-y-2">
-              {filteredLog.map(entry=>(
-                <div key={entry.id} className="p-4 rounded-2xl flex items-center gap-3" style={{ background:"#111",border:`1px solid ${entry.dayColor}25` }}>
-                  <div style={{ width:4,height:40,borderRadius:2,background:entry.dayColor,flexShrink:0 }}/>
-                  <div style={{ flex:1 }}>
-                    <div className="body-text text-white text-sm font-medium leading-tight">{entry.exName}</div>
-                    <div className="body-text text-xs mt-0.5" style={{ color:entry.dayColor+"cc" }}>{entry.dayName}</div>
-                    <div className="body-text text-white/30 text-xs">{entry.date} - {entry.time}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-2xl tracking-wide" style={{ color:entry.dayColor }}>{entry.weight?`${entry.weight}`:"--"}</div>
-                    <div className="body-text text-xs text-white/30">{entry.weight?"lb":""}</div>
-                    <div className="body-text text-xs text-white/50">{entry.reps?`x ${entry.reps}`:""}</div>
-                    {entry.est1rm&&<div className="body-text text-xs" style={{ color:"rgba(255,255,255,0.2)" }}>~{entry.est1rm}</div>}
-                  </div>
-                  <button onClick={()=>deleteLogEntry(entry.id)} className="set-btn body-text text-xs px-2 py-1 rounded-lg" style={{ color:"rgba(255,255,255,0.2)",border:"1px solid rgba(255,255,255,0.08)" }}>x</button>
-                </div>
-              ))}
-            </div>
-          )}
+          {setLog.length===0?<div className="body-text text-white/20 text-sm text-center py-12">No sets logged yet.</div>:(()=>{
+            // Group by exercise
+            const groups = {};
+            setLog.forEach(entry=>{
+              if(!groups[entry.exName]) groups[entry.exName]={ exName:entry.exName, dayColor:entry.dayColor, dayName:entry.dayName, entries:[] };
+              groups[entry.exName].entries.push(entry);
+            });
+            const [expandedGroup, setExpandedGroup] = [logFilter, setLogFilter];
+            return (
+              <div className="space-y-2">
+                {Object.values(groups).map(group=>{
+                  const isOpen = expandedGroup === group.exName;
+                  const best = group.entries.reduce((b,e)=>(e.est1rm||0)>(b.est1rm||0)?e:b, group.entries[0]);
+                  return (
+                    <div key={group.exName} className="rounded-2xl overflow-hidden" style={{ border:`1px solid ${group.dayColor}25` }}>
+                      <div className="p-3 flex items-center justify-between cursor-pointer" style={{ background:"#111" }}
+                        onClick={()=>setLogFilter(isOpen?"all":group.exName)}>
+                        <div style={{ flex:1 }}>
+                          <div className="body-text text-white text-sm font-medium leading-tight">{group.exName}</div>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <div className="body-text text-xs" style={{ color:group.dayColor+"cc" }}>{group.dayName}</div>
+                            <div className="body-text text-xs text-white/30">{group.entries.length} set{group.entries.length!==1?"s":""}</div>
+                            {best?.est1rm&&<div className="body-text text-xs" style={{ color:"rgba(255,255,255,0.3)" }}>best ~{best.est1rm} est 1RM</div>}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:20,color:group.dayColor }}>{best?.weight?`${best.weight}`:"--"}</div>
+                          <div className="body-text text-xs" style={{ color:"rgba(255,255,255,0.3)" }}>{isOpen?"▲":"▼"}</div>
+                        </div>
+                      </div>
+                      {isOpen&&(
+                        <div className="px-3 pb-3" style={{ background:"#0d0d0d" }}>
+                          {group.entries.map(entry=>(
+                            <div key={entry.id} className="flex items-center justify-between py-2 border-b" style={{ borderColor:"rgba(255,255,255,0.05)" }}>
+                              <div>
+                                <div className="body-text text-white/70 text-xs">{entry.date} - {entry.time}</div>
+                                {entry.est1rm&&<div className="body-text text-xs" style={{ color:"rgba(255,255,255,0.3)" }}>~{entry.est1rm} est 1RM</div>}
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <div className="text-right">
+                                  <div className="text-lg tracking-wide" style={{ color:entry.dayColor }}>{entry.weight?`${entry.weight} lb`:"--"}</div>
+                                  {entry.reps&&<div className="body-text text-xs text-white/30">x {entry.reps}</div>}
+                                </div>
+                                <button onClick={()=>deleteLogEntry(entry.id)} className="set-btn body-text text-xs px-2 py-1 rounded-lg" style={{ color:"rgba(255,255,255,0.2)",border:"1px solid rgba(255,255,255,0.08)" }}>x</button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
       )}
 
@@ -1335,18 +1397,39 @@ export default function App() {
 
       {activeTab==="bag"&&(
         <div className="px-4 pt-4 pb-24">
-          <div className="text-3xl tracking-wide mb-4">GYM BAG</div>
+          <div className="flex justify-between items-center mb-4">
+            <div className="text-3xl tracking-wide">GYM BAG</div>
+            <button onClick={()=>setShowBagAdd(!showBagAdd)} className="set-btn body-text text-xs px-3 py-1.5 rounded-full font-semibold"
+              style={{ background:showBagAdd?"#333":"#e8ff4720",color:showBagAdd?"white":"#e8ff47",border:`1px solid ${showBagAdd?"#555":"#e8ff4740"}` }}>
+              {showBagAdd?"Cancel":"+ Add Item"}
+            </button>
+          </div>
           <div className="flex gap-2 mb-4">
             {["essential","useful","skip"].map(f=>(
               <button key={f} onClick={()=>setBagFilter(f)} className="set-btn body-text text-xs px-4 py-2 rounded-full font-medium uppercase"
                 style={{ background:bagFilter===f?(f==="essential"?"#e8ff47":f==="useful"?"#47c8ff":"#ff6b35"):"#111",color:bagFilter===f?"#000":"#666",border:`1px solid ${bagFilter===f?"transparent":"#222"}` }}>{f}</button>
             ))}
           </div>
+          {showBagAdd&&(
+            <div className="p-4 rounded-2xl mb-4" style={{ background:"#111",border:"1px solid #e8ff4730" }}>
+              <div className="text-lg tracking-wide mb-3" style={{ color:"#e8ff47" }}>ADD TO {bagFilter.toUpperCase()}</div>
+              <div className="body-text text-white/30 text-xs mb-1">Item name</div>
+              <input type="text" placeholder="e.g. Lifting shoes" value={bagAddItem} onChange={e=>setBagAddItem(e.target.value)}
+                style={{ background:"#1a1a1a",border:"1px solid #333",color:"white",borderRadius:10,padding:"10px 12px",fontFamily:"'DM Sans',sans-serif",fontSize:14,width:"100%",boxSizing:"border-box",marginBottom:8 }}/>
+              <div className="body-text text-white/30 text-xs mb-1">Note (optional)</div>
+              <input type="text" placeholder="e.g. For heavy squat days" value={bagAddNote} onChange={e=>setBagAddNote(e.target.value)}
+                style={{ background:"#1a1a1a",border:"1px solid #333",color:"white",borderRadius:10,padding:"10px 12px",fontFamily:"'DM Sans',sans-serif",fontSize:14,width:"100%",boxSizing:"border-box",marginBottom:12 }}/>
+              <button onClick={addBagItem} className="set-btn body-text text-sm font-semibold w-full py-2.5 rounded-xl" style={{ background:"#e8ff47",color:"#000" }}>Add Item</button>
+            </div>
+          )}
           <div className="space-y-3">
-            {gymBag[bagFilter].map((item,i)=>(
-              <div key={i} className="p-4 rounded-2xl" style={{ background:"#111",border:`1px solid ${bagFilter==="essential"?"#e8ff4720":bagFilter==="useful"?"#47c8ff20":"#ff6b3520"}` }}>
-                <div className="text-lg tracking-wide" style={{ color:bagFilter==="essential"?"#e8ff47":bagFilter==="useful"?"#47c8ff":"#ff6b35" }}>{item.item.toUpperCase()}</div>
-                <div className="body-text text-white/50 text-xs mt-1">{item.note}</div>
+            {gymBagData[bagFilter].map((item,i)=>(
+              <div key={i} className="p-4 rounded-2xl flex items-start justify-between gap-2" style={{ background:"#111",border:`1px solid ${bagFilter==="essential"?"#e8ff4720":bagFilter==="useful"?"#47c8ff20":"#ff6b3520"}` }}>
+                <div style={{ flex:1 }}>
+                  <div className="text-lg tracking-wide" style={{ color:bagFilter==="essential"?"#e8ff47":bagFilter==="useful"?"#47c8ff":"#ff6b35" }}>{item.item.toUpperCase()}</div>
+                  <div className="body-text text-white/50 text-xs mt-1">{item.note}</div>
+                </div>
+                <button onClick={()=>removeBagItem(bagFilter,i)} className="set-btn body-text text-xs px-2 py-1 rounded-lg flex-shrink-0" style={{ color:"rgba(255,255,255,0.2)",border:"1px solid rgba(255,255,255,0.08)" }}>x</button>
               </div>
             ))}
           </div>

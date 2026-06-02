@@ -15,7 +15,7 @@ const QUOTES = [
 
 const PROTEIN_GOAL = 155;
 
-// ── Local date key (fixes UTC midnight bug) ───────────────────────────────────
+//  Local date key (fixes UTC midnight bug) 
 function getLocalDateKey(date = new Date()) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -23,7 +23,7 @@ function getLocalDateKey(date = new Date()) {
   return `${y}-${m}-${d}`;
 }
 
-// ── DOTS Score (male) ─────────────────────────────────────────────────────────
+//  DOTS Score (male) 
 const DOTS_COEFFS = [-307.75076, 24.0900756, -0.1918759221, 0.0007391293, -0.000001093];
 function dotsScore(bodyweightLb, totalLb) {
   const bw = bodyweightLb * 0.453592;
@@ -45,7 +45,7 @@ function dotsRating(score) {
   return { label: "Beginner", color: "#ff6b35" };
 }
 
-// ── Protein streak (uses local date, not UTC) ─────────────────────────────────
+//  Protein streak (uses local date, not UTC) 
 function calcProteinStreak(entries) {
   let streak = 0;
   const check = new Date();
@@ -56,7 +56,7 @@ function calcProteinStreak(entries) {
       streak++;
       check.setDate(check.getDate() - 1);
     } else if (i === 0) {
-      // today not yet hit — skip without breaking
+      // today not yet hit - skip without breaking
       check.setDate(check.getDate() - 1);
     } else {
       break;
@@ -65,10 +65,10 @@ function calcProteinStreak(entries) {
   return streak;
 }
 
-// ── Day-specific warm-ups ─────────────────────────────────────────────────────
+//  Day-specific warm-ups 
 const WARMUPS = {
   A: {
-    label: "UPPER A WARM-UP", note: "Shoulder prep + blood flow — 8 min", color: "#e8ff47",
+    label: "UPPER A WARM-UP", note: "Shoulder prep + blood flow - 8 min", color: "#e8ff47",
     exercises: [
       { name: "Band Pull-Apart", sets: "3 x 15", note: "Rear delt activation. Pull at chest height." },
       { name: "Arm Circle (forward + back)", sets: "2 x 15 each direction", note: "Full ROM. Big and controlled." },
@@ -78,7 +78,7 @@ const WARMUPS = {
     ]
   },
   B: {
-    label: "LOWER A WARM-UP", note: "Hip + ankle mobility — 8 min", color: "#ff6b35",
+    label: "LOWER A WARM-UP", note: "Hip + ankle mobility - 8 min", color: "#ff6b35",
     exercises: [
       { name: "Hip Circle (standing)", sets: "2 x 10 each direction", note: "Big slow circles. Wakes up the hip joint." },
       { name: "Leg Swing (front/back)", sets: "2 x 12 each leg", note: "Hold wall. Forward and back." },
@@ -88,7 +88,7 @@ const WARMUPS = {
     ]
   },
   C: {
-    label: "UPPER B WARM-UP", note: "Push + pull activation — 8 min", color: "#47c8ff",
+    label: "UPPER B WARM-UP", note: "Push + pull activation - 8 min", color: "#47c8ff",
     exercises: [
       { name: "Band Pull-Apart", sets: "3 x 15", note: "Non-negotiable rear delt primer." },
       { name: "Face Pull with Band", sets: "3 x 15", note: "Rotator cuff prep. Light resistance only." },
@@ -98,13 +98,30 @@ const WARMUPS = {
     ]
   },
   D: {
-    label: "LOWER B WARM-UP", note: "Posterior chain + hip hinge — 8 min", color: "#c47bff",
+    label: "LOWER B WARM-UP", note: "Posterior chain + hip hinge - 8 min", color: "#c47bff",
     exercises: [
       { name: "Cat-Cow", sets: "2 x 10 slow", note: "Full spinal flexion and extension each rep." },
       { name: "Glute Bridge (bodyweight)", sets: "3 x 15", note: "Wake up glutes before deadlifting." },
       { name: "Hip Hinge with Dowel / PVC", sets: "3 x 8", note: "Stick along spine. Teaches neutral back hinge." },
       { name: "Leg Swing (side to side)", sets: "2 x 12 each leg", note: "Adductor and hip flexor mobility." },
       { name: "Empty Bar RDL", sets: "2 x 8", note: "Slow eccentric, feel the hamstring stretch." },
+    ]
+  },
+  E: {
+    label: "ARMS + NECK WARM-UP", note: "Elbow + wrist prep - 5 min", color: "#ff9f47",
+    exercises: [
+      { name: "Wrist Circle", sets: "2 x 10 each direction", note: "Slow full circles. Prevents elbow pain on curls and dips." },
+      { name: "Band Pull-Apart", sets: "2 x 15", note: "Rear delt primer. Keeps shoulder healthy for dips." },
+      { name: "Tricep Stretch (overhead)", sets: "2 x 20 sec each arm", note: "Reach arm behind head, push elbow back. Full stretch." },
+      { name: "Bodyweight Dip (slow)", sets: "2 x 5", note: "Zero load warm-up. Feel the shoulder position before adding weight." },
+    ]
+  },
+  F: {
+    label: "CARDIO WARM-UP", note: "Get moving - 3 min", color: "#4ade80",
+    exercises: [
+      { name: "Brisk Walk", sets: "2 min", note: "Transition from rest to movement. Let heart rate climb naturally." },
+      { name: "Leg Swing (front/back)", sets: "1 x 10 each leg", note: "Open up the hip flexors before running." },
+      { name: "Ankle Circle", sets: "1 x 10 each", note: "Quick mobility before hitting the pavement." },
     ]
   }
 };
@@ -140,6 +157,11 @@ const EX_MUSCLE_MAP = {
   "Calf Raise": ["Calves"],
   "Weighted Decline Crunch": ["Core"],
   "Plank (Controlled)": ["Core"],
+  "Weighted Dips": ["Triceps","Chest","Front Delt"],
+  "Skull Crusher": ["Triceps"],
+  "Overhead Tricep Extension": ["Triceps"],
+  "Seated Dumbbell Press": ["Front Delt","Triceps","Side Delt"],
+  "Tricep Pushdown (Cable)": ["Triceps"],
 };
 const MUSCLE_COLORS = {
   Chest:"#e8ff47", Triceps:"#e8ff4799", "Front Delt":"#ffdd00",
@@ -155,26 +177,21 @@ const RECOMMENDED_SETS = {
 
 const DEFAULT_DAYS = [
   {
-    id:"A", label:"DAY 1", name:"UPPER A - Strength Focus", tag:"Heavy Push + Pull", color:"#e8ff47",
+    id:"A", label:"DAY 1", name:"UPPER A - Strength Focus", tag:"Heavy Push + Pull | ~60 min", color:"#e8ff47",
     timing:{ total:"55-65 min", compound_rest:180, accessory_rest:90 },
     exercises:[
       { name:"Barbell Bench Press", sets:"4 x 4-6", weight:"Start at 185 lb, add 5 lb/week", note:"Main strength driver. Full ROM, touch chest.", category:"main", trackPR:true },
       { name:"Barbell Row (Pendlay or Bent Over)", sets:"4 x 5", weight:"Match bench weight roughly", note:"Back needs to keep up with push strength.", category:"main", trackPR:true },
-      { name:"Overhead Press", sets:"3 x 6-8", weight:"Start light - build the shoulder base", note:"Shoulder health and upper chest tie-in.", category:"secondary", trackPR:true },
+      { name:"Seated Dumbbell Press", sets:"3 x 8-10", weight:"Start at 2x25-30 lb. Natural wrist path.", note:"Replaces Smith machine OHP. Builds real shoulder strength and stabilizers.", category:"secondary", trackPR:true },
       { name:"Weighted Pull-Ups or Lat Pulldown", sets:"3 x 6-8", weight:"Add weight when you can do 3x8 clean", note:"Width and upper back thickness.", category:"secondary" },
       { name:"Barbell Shrug", sets:"3 x 10-12", weight:"Start at 135-185 lb, add 10 lb/week", note:"Trap thickness. Hold peak contraction 1 sec.", category:"accessory" },
-      { name:"EZ Bar Curl", sets:"3 x 10-12", weight:"Focus on full stretch at bottom", note:"Bicep peak builder. Slow eccentric (3 sec down).", category:"accessory" },
-      { name:"Incline Dumbbell Curl", sets:"2 x 12", weight:"Light - this is a stretch curl", note:"Hits the long head. This is what makes biceps POP.", category:"accessory" },
       { name:"Ab Wheel Rollout", sets:"3 x 8-10", weight:"Bodyweight", note:"Upper ab focus. Go to parallel, not floor at first.", category:"accessory" },
-      { name:"Neck Flexion / Extension (Plate)", sets:"3 x 15-20", weight:"5-10 lb plate", note:"Full ROM. Never go heavy.", category:"neck" },
-      { name:"Neck Lateral Flexion", sets:"2 x 15 each side", weight:"5 lb plate or hand resistance", note:"Thick neck makes traps and shoulders look massive.", category:"neck" },
     ]
   },
   {
-    id:"B", label:"DAY 2", name:"LOWER A - Squat Focus", tag:"Depth + Strength", color:"#ff6b35",
-    timing:{ total:"60-70 min", compound_rest:210, accessory_rest:90 },
+    id:"B", label:"DAY 2", name:"LOWER A - Squat Focus", tag:"Depth + Strength | ~60 min", color:"#ff6b35",
+    timing:{ total:"55-65 min", compound_rest:210, accessory_rest:90 },
     exercises:[
-      { name:"Goblet Squat (Depth Work)", sets:"3 x 8", weight:"40-50 lb dumbbell", note:"FIRST - find your depth before touching barbell.", category:"mobility" },
       { name:"Barbell Back Squat", sets:"4 x 4-5", weight:"Start at 225 lb - earn depth before adding weight", note:"Film yourself from the side. Hit parallel every rep.", category:"main", trackPR:true },
       { name:"Romanian Deadlift (RDL)", sets:"3 x 8-10", weight:"Start at 135 lb", note:"Hamstring and glute builder. Fixes anterior pelvic tilt.", category:"main", trackPR:true },
       { name:"Leg Press", sets:"3 x 10-12", weight:"Moderate - feet high and wide", note:"Extra quad/glute volume without spinal load.", category:"secondary" },
@@ -184,22 +201,19 @@ const DEFAULT_DAYS = [
     ]
   },
   {
-    id:"C", label:"DAY 3", name:"UPPER B - Volume Focus", tag:"Hypertrophy + Arms", color:"#47c8ff",
+    id:"C", label:"DAY 3", name:"UPPER B - Volume Focus", tag:"Hypertrophy + Chest | ~60 min", color:"#47c8ff",
     timing:{ total:"55-65 min", compound_rest:120, accessory_rest:75 },
     exercises:[
       { name:"Incline Barbell Press", sets:"4 x 8-10", weight:"~60-65% of flat bench", note:"Upper chest development.", category:"main", trackPR:true },
       { name:"Cable Row (Seated)", sets:"4 x 10-12", weight:"Moderate", note:"Mid back thickness. Pull elbows back hard.", category:"main" },
       { name:"Dumbbell Lateral Raise", sets:"3 x 15", weight:"Light - perfect form", note:"Shoulder width. Makes your waist look smaller.", category:"secondary" },
-      { name:"Face Pull", sets:"3 x 15", weight:"Light", note:"Rear delt and rotator cuff health.", category:"secondary" },
-      { name:"Hammer Curl", sets:"3 x 10-12", weight:"Moderate", note:"Brachialis builder - pushes bicep up.", category:"accessory" },
-      { name:"Spider Curl or Preacher Curl", sets:"3 x 12", weight:"Light-moderate", note:"Isolates the bicep peak. Slow and controlled.", category:"accessory" },
+      { name:"Face Pull", sets:"3 x 15", weight:"Light", note:"Rear delt and rotator cuff health. Non-negotiable.", category:"secondary" },
+      { name:"Skull Crusher", sets:"3 x 10-12", weight:"Start at 60-75 lb EZ bar", note:"Best direct tricep mass builder. Slow eccentric, flare elbows slightly.", category:"accessory" },
       { name:"Hanging Leg Raise", sets:"3 x 12-15", weight:"Bodyweight", note:"Lower ab tie-in + hip flexor strength.", category:"accessory" },
-      { name:"Wrestlers Bridge Hold", sets:"3 x 20-30 sec", weight:"Bodyweight only", note:"Most powerful neck thickness builder.", category:"neck" },
-      { name:"Neck Flexion / Extension (Plate)", sets:"2 x 15", weight:"5-10 lb plate", note:"Keep neck training consistent 3x/week.", category:"neck" },
     ]
   },
   {
-    id:"D", label:"DAY 4", name:"LOWER B - Deadlift Focus", tag:"Posterior Chain", color:"#c47bff",
+    id:"D", label:"DAY 4", name:"LOWER B - Deadlift Focus", tag:"Posterior Chain | ~60 min", color:"#c47bff",
     timing:{ total:"55-65 min", compound_rest:210, accessory_rest:90 },
     exercises:[
       { name:"Conventional Deadlift", sets:"4 x 4-5", weight:"Start at 225 lb - technique first", note:"Add 10 lb/week early on. Film your setup.", category:"main", trackPR:true },
@@ -208,9 +222,30 @@ const DEFAULT_DAYS = [
       { name:"Glute Bridge or Hip Thrust", sets:"3 x 12", weight:"Barbell when ready", note:"Direct glute work. Fixes anterior pelvic tilt.", category:"secondary" },
       { name:"Barbell or Dumbbell Shrug", sets:"3 x 12-15", weight:"Heavy - load these seriously", note:"Trap builder after deadlifts. Traps already fired up.", category:"accessory" },
       { name:"Calf Raise", sets:"3 x 15-20", weight:"Moderate", note:"Calves respond to high rep. Full ROM.", category:"accessory" },
-      { name:"Weighted Decline Crunch", sets:"3 x 12-15", weight:"10-25 lb plate", note:"Upper ab direct hit. Hold plate at chest.", category:"accessory" },
-      { name:"Plank (Controlled)", sets:"3 x 45-60 sec", weight:"Bodyweight", note:"NOT to failure. Perfect brace, no lower back sag.", category:"accessory" },
-      { name:"Neck Lateral Flexion", sets:"3 x 15 each side", weight:"5 lb plate or hand resistance", note:"Third neck session of the week.", category:"neck" },
+    ]
+  },
+  {
+    id:"E", label:"DAY 5", name:"ARMS + NECK - Isolation Day", tag:"Triceps, Biceps, Neck | ~50 min", color:"#ff9f47",
+    timing:{ total:"45-55 min", compound_rest:90, accessory_rest:60 },
+    exercises:[
+      { name:"Weighted Dips", sets:"3 x 6-8", weight:"Bodyweight to start, add weight when 3x8 is clean", note:"Best compound tricep movement. Lean slightly forward for chest tie-in.", category:"main", trackPR:true },
+      { name:"Tricep Pushdown (Cable)", sets:"3 x 12-15", weight:"Moderate", note:"Full lockout every rep. Elbows stay pinned to sides.", category:"secondary" },
+      { name:"Overhead Tricep Extension", sets:"3 x 12", weight:"Light-moderate dumbbell", note:"Hits the long head. The part that makes arms look big from behind.", category:"accessory" },
+      { name:"EZ Bar Curl", sets:"3 x 10-12", weight:"Focus on full stretch at bottom", note:"Bicep peak builder. Slow eccentric (3 sec down).", category:"accessory" },
+      { name:"Incline Dumbbell Curl", sets:"2 x 12", weight:"Light - this is a stretch curl", note:"Hits the long head. This is what makes biceps POP.", category:"accessory" },
+      { name:"Hammer Curl", sets:"3 x 10-12", weight:"Moderate", note:"Brachialis builder - pushes bicep up.", category:"accessory" },
+      { name:"Neck Flexion / Extension (Plate)", sets:"3 x 15-20", weight:"5-10 lb plate", note:"Full ROM. Never go heavy.", category:"neck" },
+      { name:"Neck Lateral Flexion", sets:"3 x 15 each side", weight:"5 lb plate or hand resistance", note:"Do all three neck movements every session on this day.", category:"neck" },
+      { name:"Wrestlers Bridge Hold", sets:"3 x 20-30 sec", weight:"Bodyweight only", note:"Most powerful neck thickness builder. End every arms day with this.", category:"neck" },
+    ]
+  }  ,{
+    id:"F", label:"DAY 6", name:"ZONE 2 RUN - Cardio", tag:"Aerobic Base | 20-40 min", color:"#4ade80",
+    timing:{ total:"20-40 min", compound_rest:0, accessory_rest:0 },
+    exercises:[
+      { name:"Zone 2 Jog (Weeks 1-3)", sets:"20 min", weight:"Easy pace - walk if needed", note:"Build the habit first. Conversational pace the whole time.", category:"main" },
+      { name:"Zone 2 Jog (Weeks 4-6)", sets:"25-30 min", weight:"Steady pace", note:"Continuous jog, same pace - just longer.", category:"secondary" },
+      { name:"Zone 2 Jog (Weeks 7-9)", sets:"30-35 min", weight:"Steady pace", note:"One run per week can go slightly longer.", category:"secondary" },
+      { name:"Zone 2 Jog (Weeks 10-12)", sets:"35-40 min", weight:"Steady pace", note:"Ready to keep up with XC friends.", category:"accessory" },
     ]
   }
 ];
@@ -272,7 +307,7 @@ const progressionRules = [
   "Squat: earn depth before adding weight",
   "Log every session - sets, reps, weight, how it felt",
   "If you miss reps two sessions in a row, drop 10% and rebuild",
-  "Neck training: never go heavy, progress slowly",
+  "Neck training: never go heavy, progress slowly. All neck work is now on Arms day.",
   "Body scan monthly - first Monday of each month",
   "Deload every 4 weeks - reduce weight 40%, keep form perfect",
 ];
@@ -281,8 +316,8 @@ const WEEK_SCHEDULE = [
   { day:"Tue", type:"lift", dayIdx:1, label:"Lower A", color:"#ff6b35", work:"7:30-4:00" },
   { day:"Wed", type:"lift", dayIdx:2, label:"Upper B", color:"#47c8ff", work:"7:30-4:00" },
   { day:"Thu", type:"lift", dayIdx:3, label:"Lower B", color:"#c47bff", work:"7:30-4:00" },
-  { day:"Fri", type:"cardio", label:"Zone 2 Run", color:"#4ade80", work:"Off" },
-  { day:"Sat", type:"cardio", label:"Zone 2 Run", color:"#4ade80", work:"Off" },
+  { day:"Fri", type:"lift", dayIdx:4, label:"Arms + Neck", color:"#ff9f47", work:"Off" },
+  { day:"Sat", type:"lift", dayIdx:5, label:"Zone 2 Run", color:"#4ade80", work:"Off" },
   { day:"Sun", type:"rest", label:"Rest", color:"#444", work:"Off" },
 ];
 const PR_LIFTS = [
@@ -304,7 +339,7 @@ const COMPOUND_CATS = ["main","mobility"];
 function ls(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } }
 function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
 
-// ── Timer ─────────────────────────────────────────────────────────────────────
+//  Timer 
 function InlineTimer({ duration, color, label, onDismiss }) {
   const [remaining, setRemaining] = useState(duration);
   useEffect(() => {
@@ -332,7 +367,7 @@ function InlineTimer({ duration, color, label, onDismiss }) {
   );
 }
 
-// ── Set Log Modal ─────────────────────────────────────────────────────────────
+//  Set Log Modal 
 function SetLogModal({ exName, color, onSave, onSkip }) {
   const [w,setW]=useState(""), [r,setR]=useState("");
   const est = w && r ? estimate1RM(parseFloat(w), parseInt(r)) : null;
@@ -361,7 +396,7 @@ function SetLogModal({ exName, color, onSave, onSkip }) {
   );
 }
 
-// ── Rename Modal ──────────────────────────────────────────────────────────────
+//  Rename Modal 
 function RenameModal({ days, onSave, onClose }) {
   const [selDay,setSelDay]=useState(0),[selEx,setSelEx]=useState(0),[nameVal,setNameVal]=useState(days[0].exercises[0].name);
   useEffect(()=>{ setSelEx(0); setNameVal(days[selDay].exercises[0].name); },[selDay]);
@@ -391,7 +426,7 @@ function RenameModal({ days, onSave, onClose }) {
   );
 }
 
-// ── PR Toast ──────────────────────────────────────────────────────────────────
+//  PR Toast 
 function PRToast({ message, color, onDone }) {
   useEffect(() => { const t = setTimeout(onDone, 3500); return () => clearTimeout(t); }, []);
   return (
@@ -402,7 +437,7 @@ function PRToast({ message, color, onDone }) {
   );
 }
 
-// ── Protein Tab ───────────────────────────────────────────────────────────────
+//  Protein Tab 
 function ProteinTab() {
   const [entries,setEntries]=useState(()=>ls("protein_entries",{}));
   const [manualG,setManualG]=useState(""),[manualName,setManualName]=useState(""),[view,setView]=useState("today");
@@ -524,14 +559,14 @@ function ProteinTab() {
         </div>
         <div className="mt-4 p-4 rounded-2xl" style={{ background:"#111",border:"1px solid #e8ff4725" }}>
           <div className="text-xl tracking-wide mb-1" style={{ color:"#e8ff47" }}>YOUR GOAL</div>
-          <div className="body-text text-white/60 text-sm"><span style={{ color:"#47c8ff",fontFamily:"'Bebas Neue',sans-serif",fontSize:20 }}>155g/day</span> — InBody: 140 lb lean mass x 1.1g/lb.</div>
+          <div className="body-text text-white/60 text-sm"><span style={{ color:"#47c8ff",fontFamily:"'Bebas Neue',sans-serif",fontSize:20 }}>155g/day</span> - InBody: 140 lb lean mass x 1.1g/lb.</div>
         </div>
       </>}
     </div>
   );
 }
 
-// ── Body Scan Tab ─────────────────────────────────────────────────────────────
+//  Body Scan Tab 
 function BodyScanTab({ onBwChange }) {
   const [scans,setScans]=useState(()=>ls("body_scans",[]));
   const [form,setForm]=useState({date:"",weight:"",muscle:"",fat:"",bodyfat:""});
@@ -643,7 +678,7 @@ function BodyScanTab({ onBwChange }) {
   );
 }
 
-// ── Volume Tab ────────────────────────────────────────────────────────────────
+//  Volume Tab 
 function VolumeTab({ setLog }) {
   const getWeekStart=()=>{
     const now=new Date(), day=now.getDay();
@@ -704,7 +739,7 @@ function VolumeTab({ setLog }) {
   );
 }
 
-// ── Notes Tab ─────────────────────────────────────────────────────────────────
+//  Notes Tab 
 function NotesTab({ days }) {
   const [notes,setNotes]=useState(()=>ls("session_notes",[]));
   const [selDay,setSelDay]=useState(0),[noteText,setNoteText]=useState(""),[rating,setRating]=useState(3);
@@ -771,7 +806,7 @@ function NotesTab({ days }) {
   );
 }
 
-// ── Main App ──────────────────────────────────────────────────────────────────
+//  Main App 
 export default function App() {
   const [activeTab,setActiveTab]=useState(()=>sessionStorage.getItem("tab")||"home");
   const [activeDay,setActiveDay]=useState(()=>parseInt(sessionStorage.getItem("day")||"0"));
@@ -877,8 +912,8 @@ export default function App() {
   const day=days[activeDay];
   const warmup=WARMUPS[day.id];
 
-  const tabs=["home","program","protein","volume","notes","scan","logs","prs","planner","nutrition","cardio","sleep","bag","rules"];
-  const tabLabels={home:"Home",program:"Program",protein:"Protein",volume:"Volume",notes:"Notes",scan:"Body Scan",logs:"Logs",prs:"PRs",planner:"Planner",nutrition:"Food",cardio:"Cardio",sleep:"Sleep",bag:"Bag",rules:"Rules"};
+  const tabs=["home","program","protein","volume","notes","scan","logs","prs","nutrition","bag"];
+  const tabLabels={home:"Home",program:"Program",protein:"Protein",volume:"Volume",notes:"Notes",scan:"Body Scan",logs:"Logs",prs:"PRs",nutrition:"Food",bag:"Bag"};
   const uniqueExNames=[...new Set(setLog.map(e=>e.exName))];
   const filteredLog=logFilter==="all"?setLog:setLog.filter(e=>e.exName===logFilter);
 
@@ -976,8 +1011,8 @@ export default function App() {
           </div>
 
           <div className="text-xl tracking-wide mb-3">THIS WEEK</div>
-          <div className="grid grid-cols-2 gap-3 mb-5">
-            {WEEK_SCHEDULE.slice(0,4).map((s,i)=>(
+          <div className="grid grid-cols-2 gap-2 mb-5">
+            {WEEK_SCHEDULE.slice(0,6).map((s,i)=>(
               <div key={i} className="p-3 rounded-xl" style={{ background:"#111",border:`1px solid ${s.color}30` }}>
                 <div className="body-text text-white/40 text-xs">{s.day} - {s.work}</div>
                 <div className="text-lg tracking-wide mt-1" style={{ color:s.color }}>{s.label}</div>
@@ -1023,7 +1058,7 @@ export default function App() {
             </div>
           </div>
           <div className="px-4 mt-4">
-            <div className="grid grid-cols-4 gap-2 mb-4">
+            <div className="grid grid-cols-6 gap-2 mb-4">
               {days.map((d,i)=>(
                 <button key={i} onClick={()=>setActiveDay(i)} className="set-btn py-3 rounded-xl text-center"
                   style={{ background:activeDay===i?d.color:"#111",border:`1px solid ${activeDay===i?d.color:"#222"}`,color:activeDay===i?"#000":"#666" }}>
@@ -1340,13 +1375,13 @@ export default function App() {
       )}
     </div>
   );
-}// ── Protein Tab ─────────────────────────────────────────────────────────────
+}//  Protein Tab 
 function ProteinTab() {
   const [entries,setEntries]=useState(()=>ls("protein_entries",{}));
   const [manualG,setManualG]=useState(""),[manualName,setManualName]=useState(""),[view,setView]=useState("today");
   const [editingId,setEditingId]=useState(null);
   const [editG,setEditG]=useState(""),[editName,setEditName]=useState("");
-  // For history editing — which day is expanded
+  // For history editing - which day is expanded
   const [expandedHistoryDay,setExpandedHistoryDay]=useState(null);
 
   const todayKey=getLocalDateKey();
@@ -1530,14 +1565,14 @@ function ProteinTab() {
         </div>
         <div className="mt-4 p-4 rounded-2xl" style={{ background:"#111",border:"1px solid #e8ff4725" }}>
           <div className="text-xl tracking-wide mb-1" style={{ color:"#e8ff47" }}>YOUR GOAL</div>
-          <div className="body-text text-white/60 text-sm"><span style={{ color:"#47c8ff",fontFamily:"'Bebas Neue',sans-serif",fontSize:20 }}>155g/day</span> — InBody: 140 lb lean mass x 1.1g/lb.</div>
+          <div className="body-text text-white/60 text-sm"><span style={{ color:"#47c8ff",fontFamily:"'Bebas Neue',sans-serif",fontSize:20 }}>155g/day</span> - InBody: 140 lb lean mass x 1.1g/lb.</div>
         </div>
       </>}
     </div>
   );
 }
 
-// ── Body Scan Tab ─────────────────────────────────────────────────────────────
+//  Body Scan Tab 
 function BodyScanTab({ onBwChange }) {
   const [scans,setScans]=useState(()=>ls("body_scans",[]));
   const [form,setForm]=useState({date:"",weight:"",muscle:"",fat:"",bodyfat:""});
@@ -1649,7 +1684,7 @@ function BodyScanTab({ onBwChange }) {
   );
 }
 
-// ── Volume Tab ────────────────────────────────────────────────────────────────
+//  Volume Tab 
 function VolumeTab({ setLog }) {
   const getWeekStart=()=>{
     const now=new Date(), day=now.getDay();
@@ -1710,7 +1745,7 @@ function VolumeTab({ setLog }) {
   );
 }
 
-// ── Notes Tab ─────────────────────────────────────────────────────────────────
+//  Notes Tab 
 function NotesTab({ days }) {
   const [notes,setNotes]=useState(()=>ls("session_notes",[]));
   const [selDay,setSelDay]=useState(0),[noteText,setNoteText]=useState(""),[rating,setRating]=useState(3);
@@ -1777,7 +1812,7 @@ function NotesTab({ days }) {
   );
 }
 
-// ── Main App ──────────────────────────────────────────────────────────────────
+//  Main App 
 export default function App() {
   const [activeTab,setActiveTab]=useState(()=>sessionStorage.getItem("tab")||"home");
   const [activeDay,setActiveDay]=useState(()=>parseInt(sessionStorage.getItem("day")||"0"));
@@ -1883,8 +1918,8 @@ export default function App() {
   const day=days[activeDay];
   const warmup=WARMUPS[day.id];
 
-  const tabs=["home","program","protein","volume","notes","scan","logs","prs","planner","nutrition","cardio","sleep","bag","rules"];
-  const tabLabels={home:"Home",program:"Program",protein:"Protein",volume:"Volume",notes:"Notes",scan:"Body Scan",logs:"Logs",prs:"PRs",planner:"Planner",nutrition:"Food",cardio:"Cardio",sleep:"Sleep",bag:"Bag",rules:"Rules"};
+  const tabs=["home","program","protein","volume","notes","scan","logs","prs","nutrition","bag"];
+  const tabLabels={home:"Home",program:"Program",protein:"Protein",volume:"Volume",notes:"Notes",scan:"Body Scan",logs:"Logs",prs:"PRs",nutrition:"Food",bag:"Bag"};
   const uniqueExNames=[...new Set(setLog.map(e=>e.exName))];
   const filteredLog=logFilter==="all"?setLog:setLog.filter(e=>e.exName===logFilter);
 
@@ -1982,8 +2017,8 @@ export default function App() {
           </div>
 
           <div className="text-xl tracking-wide mb-3">THIS WEEK</div>
-          <div className="grid grid-cols-2 gap-3 mb-5">
-            {WEEK_SCHEDULE.slice(0,4).map((s,i)=>(
+          <div className="grid grid-cols-2 gap-2 mb-5">
+            {WEEK_SCHEDULE.slice(0,6).map((s,i)=>(
               <div key={i} className="p-3 rounded-xl" style={{ background:"#111",border:`1px solid ${s.color}30` }}>
                 <div className="body-text text-white/40 text-xs">{s.day} - {s.work}</div>
                 <div className="text-lg tracking-wide mt-1" style={{ color:s.color }}>{s.label}</div>
@@ -2029,7 +2064,7 @@ export default function App() {
             </div>
           </div>
           <div className="px-4 mt-4">
-            <div className="grid grid-cols-4 gap-2 mb-4">
+            <div className="grid grid-cols-6 gap-2 mb-4">
               {days.map((d,i)=>(
                 <button key={i} onClick={()=>setActiveDay(i)} className="set-btn py-3 rounded-xl text-center"
                   style={{ background:activeDay===i?d.color:"#111",border:`1px solid ${activeDay===i?d.color:"#222"}`,color:activeDay===i?"#000":"#666" }}>

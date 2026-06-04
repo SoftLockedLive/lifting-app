@@ -226,8 +226,8 @@ const DEFAULT_DAYS = [
     exercises:[
       { name:"Weighted Dips", sets:"3 x 6-8", weight:"Bodyweight to start, add weight when 3x8 is clean", note:"Best compound tricep movement. Lean slightly forward for chest tie-in.", category:"main", trackPR:true },
       { name:"Preacher Curl", sets:"3 x 10-12", weight:"Light-moderate, focus on full ROM", note:"Peak contraction machine. Full stretch at bottom every rep.", category:"accessory", altGroup:"bicep" },
-      { name:"EZ Bar Curl", sets:"3 x 10-12", weight:"Focus on full stretch at bottom", note:"Bicep peak builder. Slow eccentric (3 sec down).", category:"accessory", altGroup:"bicep" },
       { name:"Tricep Pushdowns", sets:"3 x 12-15", weight:"Moderate", note:"Full lockout every rep. Elbows stay pinned to sides.", category:"secondary", altGroup:"tricep" },
+      { name:"EZ Bar Curl", sets:"3 x 10-12", weight:"Focus on full stretch at bottom", note:"Bicep peak builder. Slow eccentric (3 sec down).", category:"accessory", altGroup:"bicep" },
       { name:"Overhead Tricep Extension", sets:"3 x 12", weight:"Light-moderate dumbbell", note:"Hits the long head. The part that makes arms look big from behind.", category:"accessory", altGroup:"tricep" },
       { name:"Incline Dumbbell Curl", sets:"2 x 12", weight:"Light - this is a stretch curl", note:"Hits the long head. This is what makes biceps POP.", category:"accessory", altGroup:"bicep" },
       { name:"Hammer Curl", sets:"3 x 10-12", weight:"Moderate", note:"Brachialis builder - pushes bicep up.", category:"accessory", altGroup:"bicep" },

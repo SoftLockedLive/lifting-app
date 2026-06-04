@@ -225,13 +225,12 @@ const DEFAULT_DAYS = [
     timing:{ total:"45-55 min", compound_rest:90, accessory_rest:60 },
     exercises:[
       { name:"Weighted Dips", sets:"3 x 6-8", weight:"Bodyweight to start, add weight when 3x8 is clean", note:"Best compound tricep movement. Lean slightly forward for chest tie-in.", category:"main", trackPR:true },
+      { name:"Preacher Curl", sets:"3 x 10-12", weight:"Light-moderate, focus on full ROM", note:"Peak contraction machine. Full stretch at bottom every rep.", category:"accessory", altGroup:"bicep" },
       { name:"EZ Bar Curl", sets:"3 x 10-12", weight:"Focus on full stretch at bottom", note:"Bicep peak builder. Slow eccentric (3 sec down).", category:"accessory", altGroup:"bicep" },
       { name:"Tricep Pushdowns", sets:"3 x 12-15", weight:"Moderate", note:"Full lockout every rep. Elbows stay pinned to sides.", category:"secondary", altGroup:"tricep" },
-      { name:"Preacher Curl", sets:"3 x 10-12", weight:"Light-moderate, focus on full ROM", note:"Peak contraction machine. Full stretch at bottom every rep.", category:"accessory", altGroup:"bicep" },
       { name:"Overhead Tricep Extension", sets:"3 x 12", weight:"Light-moderate dumbbell", note:"Hits the long head. The part that makes arms look big from behind.", category:"accessory", altGroup:"tricep" },
       { name:"Incline Dumbbell Curl", sets:"2 x 12", weight:"Light - this is a stretch curl", note:"Hits the long head. This is what makes biceps POP.", category:"accessory", altGroup:"bicep" },
       { name:"Hammer Curl", sets:"3 x 10-12", weight:"Moderate", note:"Brachialis builder - pushes bicep up.", category:"accessory", altGroup:"bicep" },
-      { name:"Skull Crusher", sets:"3 x 10-12", weight:"Start at 60-75 lb EZ bar", note:"Best direct tricep mass builder. Slow eccentric, flare elbows slightly.", category:"accessory", altGroup:"tricep" },
       { name:"Neck Flexion / Extension (Plate)", sets:"3 x 15-20", weight:"5-10 lb plate", note:"Full ROM. Never go heavy.", category:"neck" },
       { name:"Neck Lateral Flexion", sets:"3 x 15 each side", weight:"5 lb plate or hand resistance", note:"Do all three neck movements every session on this day.", category:"neck" },
       { name:"Wrestlers Bridge Hold", sets:"3 x 20-30 sec", weight:"Bodyweight only", note:"Most powerful neck thickness builder. End every arms day with this.", category:"neck" },
@@ -872,6 +871,107 @@ function NotesTab({ days }) {
   );
 }
 
+// ── YOGA DATA ──
+const YOGA_MORNING = {
+  title:"MORNING WAKE-UP", duration:"5 min", color:"#ffd166",
+  subtitle:"Before your phone. Every single day.",
+  note:"You will feel stiff — that's normal. Don't force anything. Breathe slowly and let gravity do the work.",
+  poses:[
+    { name:"Child's Pose", dur:"45 sec", hold:45, cue:"Kneel, sit back on heels, reach arms forward. Forehead down. Breathe into your lower back.", benefit:"Decompresses spine. Counteracts sleep stiffness.", prog:"Walk hands further forward each week." },
+    { name:"Cat-Cow Flow", dur:"45 sec slow", hold:45, cue:"Hands and knees. Inhale — drop belly, lift head. Exhale — round spine to ceiling, tuck chin. Slow and deliberate.", benefit:"Mobilizes every vertebra. Wakes up spine without loading it.", prog:"Add a side bend at each end over time." },
+    { name:"Low Lunge (each side)", dur:"30 sec each", hold:30, cue:"Step one foot forward, back knee on floor. Sink hips straight down. Front shin vertical. Don't arch lower back.", benefit:"Hip flexor opener — #1 fix for your umpiring back pain.", prog:"Raise arms overhead once comfortable." },
+    { name:"Seated Forward Fold", dur:"60 sec", hold:60, cue:"Legs straight. Hinge from hips NOT your back. Reach toward feet. Hold wherever you land. Release on every exhale. No bouncing.", benefit:"Main driver of touching your toes. Pure hamstring length.", prog:"Track weekly — you should reach slightly further each time." },
+    { name:"Supine Spinal Twist (each side)", dur:"30 sec each", hold:30, cue:"Lie on back. Pull one knee to chest, let it fall across body. Opposite arm out flat. Look away from the knee.", benefit:"Releases lower back rotation tightness from umpiring.", prog:"Stack both knees for deeper version." },
+  ]
+};
+const YOGA_EVENING = {
+  title:"EVENING WIND-DOWN", duration:"12 min", color:"#c47bff",
+  subtitle:"30 min before bed. Replaces scrolling.",
+  note:"This is your nervous system OFF switch. Every pose should feel like a release not a fight. Combine with your magnesium glycinate.",
+  poses:[
+    { name:"Jefferson Curl", dur:"60 sec slow", hold:60, important:true, cue:"Stand holding 10-15 lb plate. Slowly curl spine DOWN starting from head — chin to chest, upper back, then lower back. Reach toward floor. Hold 3 sec. Slowly reverse vertebra by vertebra. This is NOT fast.", benefit:"THE most powerful lower back mobility exercise. Decompresses every disc. Will change your back in 4 weeks.", prog:"Add 2.5 lb over weeks. Add step height when comfortable. Look it up on YouTube first — form matters." },
+    { name:"Pigeon Pose (each side)", dur:"90 sec each", hold:90, cue:"From downdog, bring one knee forward behind wrist. Extend back leg. Lower hips toward floor. Walk hands forward, rest forearms down. Breathe. Don't fight it.", benefit:"Deep hip opener. Most effective for squat depth and umpiring hip tightness.", prog:"Work toward full hip contact with floor." },
+    { name:"Standing Hamstring Stretch (each leg)", dur:"60 sec each", hold:60, cue:"Heel on a surface (chair, bench). Leg straight. Hinge forward from hips with flat back. Hold. Breathe out into the stretch. No bouncing.", benefit:"Specific hamstring length — directly builds toward touching toes.", prog:"Raise surface height as flexibility improves." },
+    { name:"Lizard Pose (each side)", dur:"60 sec each", hold:60, cue:"Step foot outside same-side hand in a lunge. Both hands inside front foot. Back knee down. Sink hips. Lower forearms for deeper version.", benefit:"Opens hip flexors AND inner groin. Huge for squat depth.", prog:"Forearms to floor when ready, then foot further forward." },
+    { name:"Wide-Leg Forward Fold", dur:"90 sec", hold:90, cue:"Sit with legs in a wide V. Walk hands forward between legs. Hinge from hips. Let gravity pull you. Breathe and sink — don't force.", benefit:"Inner thigh + hamstring. Foundation for front splits.", prog:"Track how close your chest gets to floor each week." },
+    { name:"Legs Up The Wall", dur:"2 min", hold:120, cue:"Lie on back, scoot close to wall, legs straight up. Arms relaxed. Breathe. Close your eyes. This is your wind-down signal.", benefit:"Passive hamstring stretch. Drains lactic acid. Calms nervous system for sleep.", prog:"Build toward 3-5 min over weeks." },
+    { name:"Supine Spinal Twist (each side)", dur:"45 sec each", hold:45, cue:"Lie on back. Hug both knees to chest, let them fall to one side. Arms out. Look opposite direction. Breathe into lower back.", benefit:"Final lower back release. Sets spine neutral for sleep.", prog:"Add neck rotation in same direction as knees." },
+  ]
+};
+const YOGA_MILESTONES = [
+  { goal:"Touch toes", timeline:"6-8 weeks", note:"Daily forward fold + Jefferson curl." },
+  { goal:"Back pain reduces", timeline:"3-4 weeks", note:"Jefferson curl + low lunge targeting hip flexors." },
+  { goal:"Squat depth improves noticeably", timeline:"4-6 weeks", note:"Pigeon + lizard pose are the key drivers." },
+  { goal:"Front splits prep", timeline:"4-6 months", note:"Lizard + pigeon + wide fold consistently." },
+  { goal:"Full front splits", timeline:"8-12 months", note:"Achievable with daily evening routine." },
+];
+
+function YogaSession({ session }) {
+  const [open, setOpen] = useState(false);
+  const [activeTimer, setActiveTimer] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [done, setDone] = useState({});
+  useEffect(() => {
+    if (activeTimer === null || timeLeft <= 0) { if (timeLeft <= 0 && activeTimer !== null) setActiveTimer(null); return; }
+    const id = setTimeout(() => setTimeLeft(t => t - 1), 1000);
+    return () => clearTimeout(id);
+  }, [activeTimer, timeLeft]);
+  const startTimer = (idx, secs) => { setActiveTimer(idx); setTimeLeft(secs); };
+  const toggleDone = (idx) => { setDone(d => ({ ...d, [idx]: !d[idx] })); setActiveTimer(null); };
+  const allDone = session.poses.every((_, i) => done[i]);
+  return (
+    <div className="mb-4 rounded-2xl overflow-hidden" style={{ border:`1px solid ${session.color}35` }}>
+      <button onClick={() => setOpen(o => !o)} className="w-full p-4 flex justify-between items-center set-btn" style={{ background:"#111" }}>
+        <div className="text-left">
+          <div className="text-2xl tracking-wide" style={{ color:session.color }}>{session.title}</div>
+          <div className="body-text text-white/40 text-xs">{session.duration} · {session.subtitle}</div>
+        </div>
+        <div className="flex items-center gap-2">
+          {allDone && <span className="body-text text-xs px-2 py-1 rounded-full" style={{ background:"#4ade8020",color:"#4ade80" }}>Done ✓</span>}
+          <span className="body-text text-white/30">{open ? "▲" : "▼"}</span>
+        </div>
+      </button>
+      {open && (
+        <div className="px-4 pb-4 pt-3" style={{ background:"#0a0a0a",borderTop:`1px solid ${session.color}15` }}>
+          <p className="body-text text-white/40 text-xs leading-relaxed mb-4">{session.note}</p>
+          <div className="space-y-4">
+            {session.poses.map((pose, idx) => {
+              const isDone = done[idx];
+              const timing = activeTimer === idx;
+              return (
+                <div key={idx} className="p-4 rounded-xl" style={{ background:isDone?`${session.color}0d`:"#111",border:`1px solid ${isDone?session.color+"40":"#222"}` }}>
+                  {pose.important && <span className="body-text text-xs px-2 py-0.5 rounded-full inline-block mb-2" style={{ background:"#ff6b3520",color:"#ff6b35" }}>⚡ KEY FOR BACK PAIN</span>}
+                  <div className="flex justify-between items-start mb-1">
+                    <div className="text-lg tracking-wide" style={{ color:isDone?session.color:"white" }}>{pose.name}</div>
+                    <span className="body-text text-xs shrink-0 ml-2" style={{ color:session.color }}>{pose.dur}</span>
+                  </div>
+                  <p className="body-text text-white/60 text-xs leading-relaxed mb-1">{pose.cue}</p>
+                  <p className="body-text text-white/30 text-xs mb-1">Benefit: {pose.benefit}</p>
+                  <p className="body-text text-white/20 text-xs mb-3">Progress: {pose.prog}</p>
+                  {timing ? (
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl tracking-wide" style={{ color:session.color,fontFamily:"'Bebas Neue',sans-serif" }}>{Math.floor(timeLeft/60)}:{String(timeLeft%60).padStart(2,"0")}</span>
+                      <button onClick={() => toggleDone(idx)} className="set-btn body-text text-xs px-3 py-1.5 rounded-lg" style={{ background:"#4ade8020",color:"#4ade80",border:"1px solid #4ade8040" }}>Done ✓</button>
+                      <button onClick={() => setActiveTimer(null)} className="set-btn body-text text-xs px-3 py-1.5 rounded-lg text-white/20 border border-white/10">Cancel</button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <button onClick={() => startTimer(idx, pose.hold)} className="set-btn body-text text-xs px-3 py-1.5 rounded-lg" style={{ background:`${session.color}20`,color:session.color,border:`1px solid ${session.color}40` }}>▶ Start Timer</button>
+                      <button onClick={() => toggleDone(idx)} className="set-btn body-text text-xs px-3 py-1.5 rounded-lg" style={{ background:isDone?"#4ade8020":"rgba(255,255,255,0.05)",color:isDone?"#4ade80":"rgba(255,255,255,0.3)",border:`1px solid ${isDone?"#4ade8040":"rgba(255,255,255,0.1)"}` }}>
+                        {isDone ? "✓ Done" : "Skip"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── MAIN APP ──
 export default function App() {
   const [activeTab,setActiveTab]=useState(()=>sessionStorage.getItem("tab")||"home");
@@ -987,8 +1087,8 @@ export default function App() {
   const day=days[activeDay];
   const warmup=WARMUPS[day.id];
 
-  const tabs=["home","program","protein","volume","notes","scan","logs","prs","nutrition","bag"];
-  const tabLabels={home:"Home",program:"Program",protein:"Protein",volume:"Volume",notes:"Notes",scan:"Body Scan",logs:"Logs",prs:"PRs",nutrition:"Food",bag:"Bag"};
+  const tabs=["home","program","protein","volume","notes","scan","logs","prs","nutrition","bag","yoga"];
+  const tabLabels={home:"Home",program:"Program",protein:"Protein",volume:"Volume",notes:"Notes",scan:"Body Scan",logs:"Logs",prs:"PRs",nutrition:"Food",bag:"Bag",yoga:"Yoga"};
   const uniqueExNames=[...new Set(setLog.map(e=>e.exName))];
   const filteredLog=logFilter==="all"?setLog:setLog.filter(e=>e.exName===logFilter);
 
@@ -1433,6 +1533,29 @@ export default function App() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {activeTab==="yoga"&&(
+        <div className="px-4 pt-4 pb-24">
+          <div className="text-3xl tracking-wide mb-1">YOGA</div>
+          <div className="body-text text-white/40 text-sm mb-4">Daily flexibility. Back pain, toe touch, splits.</div>
+          <div className="p-4 rounded-2xl mb-5" style={{ background:"#111",border:"1px solid #ffd16630" }}>
+            <div className="text-lg tracking-wide mb-3" style={{ color:"#ffd166" }}>YOUR MILESTONES</div>
+            <div className="space-y-3">
+              {YOGA_MILESTONES.map((m,i)=>(
+                <div key={i} className="flex justify-between items-start gap-3">
+                  <div>
+                    <div className="body-text text-white text-sm font-medium">{m.goal}</div>
+                    <div className="body-text text-white/30 text-xs">{m.note}</div>
+                  </div>
+                  <div className="body-text text-xs px-2 py-1 rounded-full shrink-0 whitespace-nowrap" style={{ background:"#ffd16615",color:"#ffd166" }}>{m.timeline}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <YogaSession session={YOGA_MORNING}/>
+          <YogaSession session={YOGA_EVENING}/>
         </div>
       )}
     </div>

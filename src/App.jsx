@@ -89,7 +89,7 @@ const WARMUPS = {
       { name: "Face Pull with Band", sets: "3 x 15", note: "Rotator cuff prep. Light resistance only." },
       { name: "Scapular Push-Up", sets: "2 x 10", note: "Plank position, protract and retract blades only." },
       { name: "Dead Hang", sets: "2 x 20-30 sec", note: "Grip and lat primer before rows." },
-      { name: "Empty Bar Incline Press", sets: "2 x 10", note: "Groove the incline angle before loading." },
+      { name: "Empty Bar Bench Press", sets: "2 x 10", note: "Groove the bench pattern before loading." },
     ]
   },
   D: {
@@ -112,11 +112,19 @@ const WARMUPS = {
     ]
   },
   F: {
-    label: "CARDIO WARM-UP", note: "Get moving - 3 min", color: "#4ade80",
+    label: "ZONE 2 WARM-UP", note: "Get moving - 3 min", color: "#4ade80",
     exercises: [
       { name: "Brisk Walk", sets: "2 min", note: "Transition from rest to movement. Let heart rate climb naturally." },
       { name: "Leg Swing (front/back)", sets: "1 x 10 each leg", note: "Open up the hip flexors before running." },
       { name: "Ankle Circle", sets: "1 x 10 each", note: "Quick mobility before hitting the pavement." },
+    ]
+  },
+  G: {
+    label: "RECOVERY DAY PREP", note: "Parasympathetic activation - 3 min", color: "#06d6a0",
+    exercises: [
+      { name: "Slow Diaphragmatic Breathing", sets: "2 min", note: "4-count in, 4-count hold, 6-count out. Shift nervous system to recovery mode." },
+      { name: "Gentle Neck Rolls", sets: "1 x 5 each direction", note: "Slow and easy. No cracking. Release tension from yesterday." },
+      { name: "Child's Pose Hold", sets: "60 sec", note: "No effort. Pure release. Let gravity do everything." },
     ]
   }
 };
@@ -148,6 +156,7 @@ const EX_MUSCLE_MAP = {
   "Front Squat or Paused Back Squat": ["Quads","Core"],
   "Bulgarian Split Squat": ["Quads","Glutes"],
   "Glute Bridge or Hip Thrust": ["Glutes","Hamstrings"],
+  "Hip Thrust": ["Glutes","Hamstrings"],
   "Barbell or Dumbbell Shrug": ["Traps"],
   "Calf Raise": ["Calves"],
   "Weighted Decline Crunch": ["Core"],
@@ -158,6 +167,11 @@ const EX_MUSCLE_MAP = {
   "Seated Dumbbell Press": ["Front Delt","Triceps","Side Delt"],
   "Tricep Pushdowns": ["Triceps"],
   "Preacher Curl": ["Biceps"],
+  "Barbell Row": ["Back","Biceps","Rear Delt"],
+  "Weighted Pull-Ups / Lat Pulldown": ["Back","Biceps"],
+  "Lateral Raise": ["Side Delt"],
+  "Tricep Pushdown": ["Triceps"],
+  "EZ Bar Curl (Arms)": ["Biceps"],
 };
 const MUSCLE_COLORS = {
   Chest:"#e8ff47", Triceps:"#e8ff4799", "Front Delt":"#ffdd00",
@@ -171,22 +185,25 @@ const RECOMMENDED_SETS = {
   Traps:8, Core:12, Calves:8,
 };
 
+// ── NEW SPLIT ──
 const DEFAULT_DAYS = [
   {
-    id:"A", label:"DAY 1", name:"UPPER A - Strength Focus", tag:"Heavy Push + Pull | ~60 min", color:"#e8ff47",
+    id:"A", label:"MON", name:"UPPER A - Heavy Bench", tag:"Heavy Push + Pull | ~60 min", color:"#e8ff47",
     timing:{ total:"55-65 min", compound_rest:180, accessory_rest:90 },
+    warmupKey:"A",
     exercises:[
-      { name:"Barbell Bench Press", sets:"4 x 4-6", weight:"Start at 185 lb, add 5 lb/week", note:"Main strength driver. Full ROM, touch chest.", category:"main", trackPR:true },
-      { name:"Barbell Row (Pendlay or Bent Over)", sets:"4 x 5", weight:"Match bench weight roughly", note:"Back needs to keep up with push strength.", category:"main", trackPR:true },
-      { name:"Seated Dumbbell Press", sets:"3 x 8-10", weight:"Start at 2x25-30 lb. Natural wrist path.", note:"Replaces Smith machine OHP. Builds real shoulder strength and stabilizers.", category:"secondary", trackPR:true },
-      { name:"Weighted Pull-Ups or Lat Pulldown", sets:"3 x 6-8", weight:"Add weight when you can do 3x8 clean", note:"Width and upper back thickness.", category:"secondary" },
+      { name:"Barbell Bench Press", sets:"4 x 4-6", weight:"Start at 185 lb, add 5 lb/week", note:"Main strength driver. Full ROM, touch chest. Film from side.", category:"main", trackPR:true },
+      { name:"Barbell Row", sets:"4 x 5", weight:"Match bench weight roughly", note:"Back needs to keep up with push strength. Chest to bar.", category:"main", trackPR:true },
+      { name:"Seated Dumbbell Press", sets:"3 x 8-10", weight:"Start at 2x25-30 lb. Natural wrist path.", note:"Real shoulder strength and stabilizers. Slow eccentric.", category:"secondary", trackPR:true },
+      { name:"Weighted Pull-Ups / Lat Pulldown", sets:"3 x 6-8", weight:"Add weight when you can do 3x8 clean", note:"Width and upper back thickness.", category:"secondary" },
       { name:"Barbell Shrug", sets:"3 x 10-12", weight:"Start at 135-185 lb, add 10 lb/week", note:"Trap thickness. Hold peak contraction 1 sec.", category:"accessory" },
       { name:"Ab Wheel Rollout", sets:"3 x 8-10", weight:"Bodyweight", note:"Upper ab focus. Go to parallel, not floor at first.", category:"ab" },
     ]
   },
   {
-    id:"B", label:"DAY 2", name:"LOWER A - Squat Focus", tag:"Depth + Strength | ~60 min", color:"#ff6b35",
+    id:"B", label:"TUE", name:"LOWER A - Squat Focus", tag:"Depth + Strength | ~60 min", color:"#ff6b35",
     timing:{ total:"55-65 min", compound_rest:210, accessory_rest:90 },
+    warmupKey:"B",
     exercises:[
       { name:"Barbell Back Squat", sets:"4 x 4-5", weight:"Start at 225 lb - earn depth before adding weight", note:"Film yourself from the side. Hit parallel every rep.", category:"main", trackPR:true },
       { name:"Romanian Deadlift (RDL)", sets:"3 x 8-10", weight:"Start at 135 lb", note:"Hamstring and glute builder. Fixes anterior pelvic tilt.", category:"main", trackPR:true },
@@ -197,56 +214,138 @@ const DEFAULT_DAYS = [
     ]
   },
   {
-    id:"C", label:"DAY 3", name:"UPPER B - Volume Focus", tag:"Hypertrophy + Chest | ~60 min", color:"#47c8ff",
-    timing:{ total:"55-65 min", compound_rest:120, accessory_rest:75 },
+    id:"C", label:"WED", name:"ZONE 2 + RECOVERY", tag:"Aerobic + Mobility | 45-60 min", color:"#06d6a0",
+    timing:{ total:"45-60 min", compound_rest:0, accessory_rest:0 },
+    warmupKey:"G",
+    isRecovery:true,
     exercises:[
-      { name:"Incline Barbell Press", sets:"4 x 8-10", weight:"~60-65% of flat bench", note:"Upper chest development.", category:"main", trackPR:true },
-      { name:"Cable Row (Seated)", sets:"4 x 10-12", weight:"Moderate", note:"Mid back thickness. Pull elbows back hard.", category:"main" },
-      { name:"Dumbbell Lateral Raise", sets:"3 x 15", weight:"Light - perfect form", note:"Shoulder width. Makes your waist look smaller.", category:"secondary" },
-      { name:"Face Pull", sets:"3 x 15", weight:"Light", note:"Rear delt and rotator cuff health. Non-negotiable.", category:"secondary" },
-      { name:"Skull Crusher", sets:"3 x 10-12", weight:"Start at 60-75 lb EZ bar", note:"Best direct tricep mass builder. Slow eccentric, flare elbows slightly.", category:"accessory" },
-      { name:"Hanging Leg Raise", sets:"3 x 12-15", weight:"Bodyweight", note:"Lower ab tie-in + hip flexor strength.", category:"ab" },
+      { name:"Zone 2 Cardio (Weeks 1-3)", sets:"20 min", weight:"Easy pace — nasal breathing only", note:"If you can't hold a conversation, slow down. Walk if needed. This is NOT a workout — it's recovery.", category:"main" },
+      { name:"Zone 2 Cardio (Weeks 4-6)", sets:"25-30 min", weight:"Steady pace", note:"Continuous jog. Same easy effort, just longer. Heart rate 130-150 bpm max.", category:"secondary" },
+      { name:"Zone 2 Cardio (Weeks 7-9)", sets:"30-35 min", weight:"Steady pace", note:"One session per week can go slightly longer. Still conversational pace.", category:"secondary" },
+      { name:"Zone 2 Cardio (Weeks 10-12)", sets:"35-40 min", weight:"Steady pace", note:"Ready to keep up with XC friends. You've built the aerobic base.", category:"accessory" },
     ]
   },
   {
-    id:"D", label:"DAY 4", name:"LOWER B - Deadlift Focus", tag:"Posterior Chain | ~60 min", color:"#c47bff",
+    id:"D", label:"THU", name:"LOWER B - Deadlift Focus", tag:"Posterior Chain | ~60 min", color:"#c47bff",
     timing:{ total:"55-65 min", compound_rest:210, accessory_rest:90 },
+    warmupKey:"D",
     exercises:[
-      { name:"Conventional Deadlift", sets:"4 x 4-5", weight:"Start at 225 lb - technique first", note:"Add 10 lb/week early on. Film your setup.", category:"main", trackPR:true },
-      { name:"Front Squat or Paused Back Squat", sets:"3 x 5", weight:"Light - technique focus", note:"Front squat forces upright torso = teaches depth.", category:"main" },
-      { name:"Bulgarian Split Squat", sets:"3 x 8 each leg", weight:"Dumbbells - start light", note:"Single leg work fixes imbalances.", category:"secondary" },
-      { name:"Glute Bridge or Hip Thrust", sets:"3 x 12", weight:"Barbell when ready", note:"Direct glute work. Fixes anterior pelvic tilt.", category:"secondary" },
+      { name:"Conventional Deadlift", sets:"4 x 3-5", weight:"Start at 225 lb - technique first", note:"Add 10 lb/week early on. Film your setup every session.", category:"main", trackPR:true },
+      { name:"Front Squat or Paused Back Squat", sets:"3 x 5", weight:"Light - technique focus", note:"Front squat forces upright torso = teaches depth. Pause 2 sec at bottom.", category:"main" },
+      { name:"Bulgarian Split Squat", sets:"3 x 8 each leg", weight:"Dumbbells - start light", note:"Single leg work fixes imbalances. Rear foot elevated on bench.", category:"secondary" },
+      { name:"Hip Thrust", sets:"3 x 10-12", weight:"Barbell when ready", note:"Direct glute work. Fixes anterior pelvic tilt. Full hip extension at top.", category:"secondary" },
       { name:"Barbell or Dumbbell Shrug", sets:"3 x 12-15", weight:"Heavy - load these seriously", note:"Trap builder after deadlifts. Traps already fired up.", category:"accessory" },
-      { name:"Calf Raise", sets:"3 x 15-20", weight:"Moderate", note:"Calves respond to high rep. Full ROM.", category:"accessory" },
+      { name:"Calf Raise", sets:"3 x 15-20", weight:"Moderate", note:"Calves respond to high rep. Full ROM — all the way up, all the way down.", category:"accessory" },
     ]
   },
   {
-    id:"E", label:"DAY 5", name:"ARMS + NECK - Isolation Day", tag:"Triceps, Biceps, Neck | ~50 min", color:"#ff9f47",
+    id:"E", label:"FRI", name:"UPPER B - Volume Day", tag:"Hypertrophy + Ump Day | ~60 min", color:"#47c8ff",
+    timing:{ total:"55-65 min", compound_rest:120, accessory_rest:75 },
+    warmupKey:"C",
+    exercises:[
+      { name:"Barbell Bench Press", sets:"4 x 6-8", weight:"~80-85% of Monday weight", note:"Volume bench. Same movement, lighter load, more reps. Focus on feel.", category:"main", trackPR:true },
+      { name:"Incline Barbell Press", sets:"3 x 8-10", weight:"~60-65% of flat bench weight", note:"Upper chest development. Controlled descent, slight flare on the way up.", category:"main" },
+      { name:"Cable Row (Seated)", sets:"4 x 10-12", weight:"Moderate — pull elbows back hard", note:"Mid back thickness. Pause at the top of each rep. No swinging.", category:"main" },
+      { name:"Face Pull", sets:"3 x 15-20", weight:"Light", note:"Rear delt and rotator cuff health. Non-negotiable — protect your umpiring shoulder.", category:"secondary" },
+      { name:"Lateral Raise", sets:"3 x 12-15", weight:"Light - perfect form only", note:"Shoulder width. Makes your waist look smaller. Pinky up, lead with elbow.", category:"secondary" },
+      { name:"Hanging Leg Raise", sets:"3 x 12-15", weight:"Bodyweight", note:"Lower ab tie-in + hip flexor strength. Control the descent.", category:"ab" },
+    ]
+  },
+  {
+    id:"F", label:"SAT", name:"ARMS + NECK - Isolation Day", tag:"Triceps, Biceps, Neck | ~50 min", color:"#ff9f47",
     timing:{ total:"45-55 min", compound_rest:90, accessory_rest:60 },
+    warmupKey:"E",
     exercises:[
       { name:"Weighted Dips", sets:"3 x 6-8", weight:"Bodyweight to start, add weight when 3x8 is clean", note:"Best compound tricep movement. Lean slightly forward for chest tie-in.", category:"main", trackPR:true },
-      { name:"Preacher Curl", sets:"3 x 10-12", weight:"Light-moderate, focus on full ROM", note:"Peak contraction machine. Full stretch at bottom every rep.", category:"accessory", altGroup:"bicep" },
-      { name:"Tricep Pushdowns", sets:"3 x 12-15", weight:"Moderate", note:"Full lockout every rep. Elbows stay pinned to sides.", category:"secondary", altGroup:"tricep" },
-      { name:"EZ Bar Curl", sets:"3 x 10-12", weight:"Focus on full stretch at bottom", note:"Bicep peak builder. Slow eccentric (3 sec down).", category:"accessory", altGroup:"bicep" },
+      { name:"EZ Bar Curl", sets:"3 x 10-12", weight:"Focus on full stretch at bottom", note:"Bicep peak builder. Slow eccentric (3 sec down). Elbows pinned.", category:"accessory", altGroup:"bicep" },
+      { name:"Hammer Curl", sets:"3 x 10-12", weight:"Moderate", note:"Brachialis builder — pushes bicep up from underneath.", category:"accessory", altGroup:"bicep" },
+      { name:"Tricep Pushdown", sets:"3 x 12-15", weight:"Moderate", note:"Full lockout every rep. Elbows stay pinned to sides.", category:"secondary", altGroup:"tricep" },
       { name:"Overhead Tricep Extension", sets:"3 x 12", weight:"Light-moderate dumbbell", note:"Hits the long head. The part that makes arms look big from behind.", category:"accessory", altGroup:"tricep" },
-      { name:"Incline Dumbbell Curl", sets:"2 x 12", weight:"Light - this is a stretch curl", note:"Hits the long head. This is what makes biceps POP.", category:"accessory", altGroup:"bicep" },
-      { name:"Hammer Curl", sets:"3 x 10-12", weight:"Moderate", note:"Brachialis builder - pushes bicep up.", category:"accessory", altGroup:"bicep" },
-      { name:"Neck Flexion / Extension (Plate)", sets:"3 x 15-20", weight:"5-10 lb plate", note:"Full ROM. Never go heavy.", category:"neck" },
-      { name:"Neck Lateral Flexion", sets:"3 x 15 each side", weight:"5 lb plate or hand resistance", note:"Do all three neck movements every session on this day.", category:"neck" },
-      { name:"Wrestlers Bridge Hold", sets:"3 x 20-30 sec", weight:"Bodyweight only", note:"Most powerful neck thickness builder. End every arms day with this.", category:"neck" },
-    ]
-  },
-  {
-    id:"F", label:"DAY 6", name:"ZONE 2 RUN - Cardio", tag:"Aerobic Base | 20-40 min", color:"#4ade80",
-    timing:{ total:"20-40 min", compound_rest:0, accessory_rest:0 },
-    exercises:[
-      { name:"Zone 2 Jog (Weeks 1-3)", sets:"20 min", weight:"Easy pace - walk if needed", note:"Build the habit first. Conversational pace the whole time.", category:"main" },
-      { name:"Zone 2 Jog (Weeks 4-6)", sets:"25-30 min", weight:"Steady pace", note:"Continuous jog, same pace - just longer.", category:"secondary" },
-      { name:"Zone 2 Jog (Weeks 7-9)", sets:"30-35 min", weight:"Steady pace", note:"One run per week can go slightly longer.", category:"secondary" },
-      { name:"Zone 2 Jog (Weeks 10-12)", sets:"35-40 min", weight:"Steady pace", note:"Ready to keep up with XC friends.", category:"accessory" },
+      { name:"Neck Flexion / Extension / Lateral (3 rounds)", sets:"3 x 15-20 each", weight:"5-10 lb plate or hand resistance", note:"All three movements every session. Never go heavy. Full ROM. This is what builds neck thickness.", category:"neck" },
     ]
   }
 ];
+
+// ── RECOVERY DAY PROTOCOL ──
+const RECOVERY_PROTOCOL = {
+  zone2: {
+    title: "ZONE 2 CARDIO",
+    color: "#06d6a0",
+    icon: "🏃",
+    phases: [
+      { phase:"Weeks 1-3", duration:"20 min", note:"Easy jog or bike. If you can't hold a conversation, you're going too hard." },
+      { phase:"Weeks 4-6", duration:"25-30 min", note:"Continuous zone 2. Same effort, longer duration." },
+      { phase:"Weeks 7-9", duration:"30-35 min", note:"Steady base. Heart rate 130-150 bpm max." },
+      { phase:"Weeks 10-12", duration:"35-40 min", note:"Full aerobic base built. XC pace is achievable now." },
+    ]
+  },
+  mobility: {
+    title: "MOBILITY CIRCUIT",
+    color: "#ffd166",
+    icon: "🧘",
+    note: "Do this AFTER zone 2. Body is warm — best time to stretch.",
+    exercises: [
+      { name:"Hip Flexor Lunge Stretch", dur:"45 sec each side", cue:"Step forward into a deep lunge, back knee on floor. Sink hips straight down. Hold and breathe — don't bounce.", benefit:"Directly fixes anterior pelvic tilt. Huge for deadlift and umpiring back pain." },
+      { name:"Seated Hamstring Stretch", dur:"60 sec each leg", cue:"Sit on floor, one leg straight. Hinge from hips (not your back) toward foot. Hold wherever you land. Exhale into it.", benefit:"Main driver of touching your toes. Pure hamstring length." },
+      { name:"Pigeon Pose", dur:"90 sec each side", cue:"From downdog, bring knee forward behind wrist. Back leg extended. Walk hands forward, rest forearms down. Breathe.", benefit:"Deep hip opener. #1 fix for squat depth." },
+      { name:"Thoracic Rotation (seated)", dur:"45 sec each side", cue:"Sit cross-legged. Place hand behind head. Rotate upper back only — hips stay forward. Slow and deliberate.", benefit:"Thoracic mobility for bench lockout and overhead position." },
+      { name:"Child's Pose with Lat Reach", dur:"60 sec", cue:"Kneel, reach arms forward, sit back toward heels. Walk both hands to one side, hold, then the other. Breathe into lower back.", benefit:"Lat and lower back decompression after squats and deadlifts." },
+      { name:"90/90 Hip Switch", dur:"5 slow reps each side", cue:"Sit in 90/90 position. Slowly rotate hips and switch to the other side. Feel internal and external hip rotation.", benefit:"Hip mobility that directly improves squat depth and single-leg stability." },
+    ]
+  },
+  softTissue: {
+    title: "SOFT TISSUE WORK",
+    color: "#ff9f47",
+    icon: "🔵",
+    note: "Foam roll or lacrosse ball. 60-90 sec per spot. Slow, deliberate pressure.",
+    targets: [
+      { area:"Quads / IT Band", cue:"Roll outer quad and IT band from hip to knee. Pause on tender spots for 20-30 sec.", priority:"HIGH — after squat day" },
+      { area:"Hamstrings", cue:"Sit on roller under thighs. Slowly roll hip to knee. Internal and external rotation while rolling.", priority:"HIGH — after deadlift day" },
+      { area:"Upper Back / Thoracic", cue:"Roller horizontal across upper back. Arms crossed on chest. Roll T4-T8. Avoid lower back.", priority:"MEDIUM" },
+      { area:"Glutes / Piriformis", cue:"Sit on lacrosse ball, one ankle on opposite knee (figure-4). Slowly move to find tight spots.", priority:"HIGH — helps with squat depth" },
+      { area:"Calves", cue:"Roller under calf, opposite leg on top for pressure. Slow roll ankle to knee.", priority:"MEDIUM" },
+      { area:"Lats", cue:"Foam roller under armpit, arm overhead. Roll along outer back from armpit to mid-back.", priority:"MEDIUM — after row/pull days" },
+    ]
+  },
+  contrast: {
+    title: "CONTRAST THERAPY",
+    color: "#47c8ff",
+    icon: "🧊",
+    note: "Optional but very effective for recovery. Do after soft tissue work.",
+    steps: [
+      { label:"Cold Shower", duration:"2-3 min", note:"End your shower cold. Starts at 60-80°F. Not ice bath — just cold tap." },
+      { label:"Warm Again", duration:"1-2 min", note:"Return to warm water." },
+      { label:"Cold Finish", duration:"60-90 sec", note:"End cold. Forces vasoconstriction and subsequent vasodilation — flushes lactic acid." },
+    ]
+  },
+  nutrition: {
+    title: "RECOVERY NUTRITION",
+    color: "#c47bff",
+    icon: "🥩",
+    note: "Recovery days are NOT low-calorie days. Muscle is built on rest days.",
+    items: [
+      { label:"Protein", target:"Still hit 155g", note:"Don't drop protein on off days. Muscle synthesis peaks 24-48 hrs post-lift." },
+      { label:"Carbs", target:"Moderate — 150-250g", note:"You don't need to carb up, but don't restrict. Replenishes glycogen for Friday." },
+      { label:"Hydration", target:"3+ liters", note:"Connective tissue repairs on rest days. Water is the medium." },
+      { label:"Creatine", target:"5g as always", note:"Take daily regardless of training. Consistency is what loads muscle creatine." },
+      { label:"Magnesium Glycinate", target:"300-400mg before bed", note:"Recovery day is when this matters most. Better sleep = better adaptation." },
+    ]
+  },
+  sleep: {
+    title: "SLEEP PRIORITY",
+    color: "#4ade80",
+    icon: "😴",
+    note: "Wednesday is your biggest recovery window. Protect it.",
+    tips: [
+      "Aim for 8-9 hours tonight specifically — this is peak adaptation window",
+      "Dim lights by 9:30 PM — melatonin delay with ADD means you need a head start",
+      "Magnesium glycinate 60 min before bed — glycinate form only",
+      "No screens 30 min before sleep — Kindle or audiobook only",
+      "Room temp 65-68°F — core temp drop triggers sleep onset",
+      "Tomorrow (Thursday) is your hardest lower day — sleep tonight is literally training",
+    ]
+  }
+};
 
 const nutrition = [
   { time:"Morning", meal:"Protein shake or chocolate milk", note:"30-40g protein. Liquid beats nausea on Azstarys." },
@@ -282,22 +381,7 @@ const gymBag = {
     { item:"Elbow sleeves", note:"Not needed unless you have joint pain." },
   ]
 };
-const cardioWeeks = [
-  { phase:"Weeks 1-3", duration:"20 min", type:"Easy Zone 2 jog", note:"Walk if needed. Build the habit first." },
-  { phase:"Weeks 4-6", duration:"25-30 min", type:"Steady Zone 2", note:"Continuous jog, same pace - just longer." },
-  { phase:"Weeks 7-9", duration:"30-35 min", type:"Steady Zone 2", note:"One run per week can go slightly longer." },
-  { phase:"Weeks 10-12", duration:"35-40 min", type:"Zone 2 + optional progression", note:"Ready to keep up with XC friends." },
-];
-const sleepProtocol = [
-  { time:"Summer goal", action:"11:30 pm bedtime to start", note:"Move 15 min earlier every week." },
-  { time:"2 hrs before bed", action:"Dim all lights", note:"Melatonin is delayed with ADD. Light is the enemy." },
-  { time:"90 min before bed", action:"Stop eating", note:"Digestion raises core temp." },
-  { time:"60 min before bed", action:"Take magnesium glycinate", note:"300-400mg. Glycinate form only." },
-  { time:"30 min before bed", action:"Kindle only - no screens", note:"ADD wind-down cue." },
-  { time:"Caffeine rule", action:"Nothing after 2-3 pm", note:"Pushes your already-late sleep later." },
-  { time:"Weekends", action:"Stay within 1 hr of weekday time", note:"Social jetlag makes Monday brutal." },
-  { time:"Room temp", action:"65-68 F", note:"Core temp drop triggers sleep onset." },
-];
+
 const progressionRules = [
   "Add weight ONLY when you hit the top of the rep range for ALL sets",
   "Upper body: add 5 lb when ready",
@@ -305,19 +389,21 @@ const progressionRules = [
   "Squat: earn depth before adding weight",
   "Log every session - sets, reps, weight, how it felt",
   "If you miss reps two sessions in a row, drop 10% and rebuild",
-  "Neck training: never go heavy, progress slowly. All neck work is now on Arms day.",
+  "Neck training: never go heavy, progress slowly",
   "Body scan monthly - first Monday of each month",
   "Deload every 4 weeks - reduce weight 40%, keep form perfect",
 ];
+
 const WEEK_SCHEDULE = [
   { day:"Mon", type:"lift", dayIdx:0, label:"Upper A", color:"#e8ff47", work:"7:30-4:00", bodyScan:true },
   { day:"Tue", type:"lift", dayIdx:1, label:"Lower A", color:"#ff6b35", work:"7:30-4:00" },
-  { day:"Wed", type:"lift", dayIdx:2, label:"Upper B", color:"#47c8ff", work:"7:30-4:00" },
+  { day:"Wed", type:"recovery", dayIdx:2, label:"Zone 2 + Recovery", color:"#06d6a0", work:"7:30-4:00" },
   { day:"Thu", type:"lift", dayIdx:3, label:"Lower B", color:"#c47bff", work:"7:30-4:00" },
-  { day:"Fri", type:"lift", dayIdx:4, label:"Arms + Neck", color:"#ff9f47", work:"Off" },
-  { day:"Sat", type:"lift", dayIdx:5, label:"Zone 2 Run", color:"#4ade80", work:"Off" },
+  { day:"Fri", type:"lift", dayIdx:4, label:"Upper B", color:"#47c8ff", work:"Off" },
+  { day:"Sat", type:"lift", dayIdx:5, label:"Arms + Neck", color:"#ff9f47", work:"Off" },
   { day:"Sun", type:"rest", label:"Rest", color:"#444", work:"Off" },
 ];
+
 const PR_LIFTS = [
   { key:"bench", label:"Bench Press", color:"#e8ff47" },
   { key:"squat", label:"Back Squat", color:"#ff6b35" },
@@ -338,6 +424,7 @@ const COMPOUND_CATS = ["main","mobility"];
 function ls(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } }
 function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
 
+// ── INLINE TIMER ──
 function InlineTimer({ duration, color, label, onDismiss }) {
   const [remaining, setRemaining] = useState(duration);
   useEffect(() => {
@@ -365,6 +452,7 @@ function InlineTimer({ duration, color, label, onDismiss }) {
   );
 }
 
+// ── SET LOG MODAL ──
 function SetLogModal({ exName, color, onSave, onSkip }) {
   const [w,setW]=useState(""), [r,setR]=useState("");
   const est = w && r ? estimate1RM(parseFloat(w), parseInt(r)) : null;
@@ -393,35 +481,39 @@ function SetLogModal({ exName, color, onSave, onSkip }) {
   );
 }
 
+// ── RENAME MODAL ──
 function RenameModal({ days, onSave, onClose }) {
-  const [selDay,setSelDay]=useState(0),[selEx,setSelEx]=useState(0),[nameVal,setNameVal]=useState(days[0].exercises[0].name);
-  useEffect(()=>{ setSelEx(0); setNameVal(days[selDay].exercises[0].name); },[selDay]);
-  useEffect(()=>{ setNameVal(days[selDay].exercises[selEx].name); },[selEx]);
+  const liftDays = days.filter(d => !d.isRecovery);
+  const [selDay,setSelDay]=useState(0),[selEx,setSelEx]=useState(0),[nameVal,setNameVal]=useState(liftDays[0].exercises[0].name);
+  useEffect(()=>{ setSelEx(0); setNameVal(liftDays[selDay].exercises[0].name); },[selDay]);
+  useEffect(()=>{ setNameVal(liftDays[selDay].exercises[selEx].name); },[selEx]);
+  const originalDayIdx = days.findIndex(d => d.id === liftDays[selDay].id);
   return (
     <div style={{ position:"fixed",inset:0,zIndex:10000,background:"rgba(0,0,0,0.9)",display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(4px)",padding:24 }}>
       <div style={{ background:"#111",border:"1px solid #333",borderRadius:20,padding:24,width:"100%",maxWidth:360 }}>
         <div style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:22,color:"white",marginBottom:4 }}>RENAME EXERCISE</div>
         <div style={{ fontFamily:"'DM Sans',sans-serif",fontSize:12,color:"rgba(255,255,255,0.3)",marginBottom:20 }}>Pick a day, pick an exercise, type new name</div>
-        <div style={{ display:"flex",gap:8,marginBottom:16 }}>
-          {days.map((d,i)=>(
-            <button key={i} onClick={()=>setSelDay(i)} style={{ flex:1,padding:"8px 0",borderRadius:10,border:`1px solid ${selDay===i?d.color:"#333"}`,background:selDay===i?d.color+"20":"transparent",color:selDay===i?d.color:"#555",fontFamily:"'Bebas Neue',sans-serif",fontSize:18,cursor:"pointer" }}>{d.id}</button>
+        <div style={{ display:"flex",gap:8,marginBottom:16,flexWrap:"wrap" }}>
+          {liftDays.map((d,i)=>(
+            <button key={i} onClick={()=>setSelDay(i)} style={{ padding:"8px 12px",borderRadius:10,border:`1px solid ${selDay===i?d.color:"#333"}`,background:selDay===i?d.color+"20":"transparent",color:selDay===i?d.color:"#555",fontFamily:"'Bebas Neue',sans-serif",fontSize:16,cursor:"pointer" }}>{d.id}</button>
           ))}
         </div>
         <div style={{ maxHeight:160,overflowY:"auto",marginBottom:16,borderRadius:10,border:"1px solid #222" }}>
-          {days[selDay].exercises.map((ex,i)=>(
-            <button key={i} onClick={()=>setSelEx(i)} style={{ display:"block",width:"100%",textAlign:"left",padding:"10px 14px",background:selEx===i?"#222":"transparent",border:"none",borderBottom:i<days[selDay].exercises.length-1?"1px solid #1a1a1a":"none",color:selEx===i?"white":"rgba(255,255,255,0.45)",fontFamily:"'DM Sans',sans-serif",fontSize:13,cursor:"pointer" }}>{ex.name}</button>
+          {liftDays[selDay].exercises.map((ex,i)=>(
+            <button key={i} onClick={()=>setSelEx(i)} style={{ display:"block",width:"100%",textAlign:"left",padding:"10px 14px",background:selEx===i?"#222":"transparent",border:"none",borderBottom:i<liftDays[selDay].exercises.length-1?"1px solid #1a1a1a":"none",color:selEx===i?"white":"rgba(255,255,255,0.45)",fontFamily:"'DM Sans',sans-serif",fontSize:13,cursor:"pointer" }}>{ex.name}</button>
           ))}
         </div>
-        <input type="text" value={nameVal} onChange={e=>setNameVal(e.target.value)} style={{ background:"#1a1a1a",border:`1px solid ${days[selDay].color}`,color:"white",borderRadius:10,padding:"10px 14px",fontFamily:"'DM Sans',sans-serif",fontSize:14,width:"100%",boxSizing:"border-box",marginBottom:16 }}/>
+        <input type="text" value={nameVal} onChange={e=>setNameVal(e.target.value)} style={{ background:"#1a1a1a",border:`1px solid ${liftDays[selDay].color}`,color:"white",borderRadius:10,padding:"10px 14px",fontFamily:"'DM Sans',sans-serif",fontSize:14,width:"100%",boxSizing:"border-box",marginBottom:16 }}/>
         <div style={{ display:"flex",gap:10 }}>
           <button onClick={onClose} style={{ flex:1,padding:"11px 0",borderRadius:12,border:"1px solid #333",background:"transparent",color:"rgba(255,255,255,0.4)",fontFamily:"'DM Sans',sans-serif",fontSize:13,fontWeight:600,cursor:"pointer" }}>Cancel</button>
-          <button onClick={()=>onSave(selDay,selEx,nameVal)} style={{ flex:2,padding:"11px 0",borderRadius:12,border:"none",background:days[selDay].color,color:"#000",fontFamily:"'DM Sans',sans-serif",fontSize:13,fontWeight:700,cursor:"pointer" }}>Save Name</button>
+          <button onClick={()=>onSave(originalDayIdx,selEx,nameVal)} style={{ flex:2,padding:"11px 0",borderRadius:12,border:"none",background:liftDays[selDay].color,color:"#000",fontFamily:"'DM Sans',sans-serif",fontSize:13,fontWeight:700,cursor:"pointer" }}>Save Name</button>
         </div>
       </div>
     </div>
   );
 }
 
+// ── PR TOAST ──
 function PRToast({ message, color, onDone }) {
   useEffect(() => { const t = setTimeout(onDone, 3500); return () => clearTimeout(t); }, []);
   return (
@@ -432,28 +524,196 @@ function PRToast({ message, color, onDone }) {
   );
 }
 
-// ── PROTEIN TAB (single, updated version with edit support) ──
+// ── RECOVERY DAY TAB ──
+function RecoveryDayView({ day }) {
+  const [openSection, setOpenSection] = useState("zone2");
+  const [checkedItems, setCheckedItems] = useState({});
+  const [mobilityTimers, setMobilityTimers] = useState({});
+  const toggle = (key) => setOpenSection(o => o === key ? null : key);
+  const checkItem = (key) => setCheckedItems(p => ({ ...p, [key]: !p[key] }));
+  const startMobilityTimer = (idx, secs) => {
+    setMobilityTimers(p => ({ ...p, [idx]: secs }));
+    const iv = setInterval(() => {
+      setMobilityTimers(p => {
+        const next = (p[idx] || 0) - 1;
+        if (next <= 0) { clearInterval(iv); return { ...p, [idx]: 0 }; }
+        return { ...p, [idx]: next };
+      });
+    }, 1000);
+  };
+  const p = RECOVERY_PROTOCOL;
+  const sections = [
+    { key:"zone2", title:p.zone2.title, color:p.zone2.color, icon:p.zone2.icon },
+    { key:"mobility", title:p.mobility.title, color:p.mobility.color, icon:p.mobility.icon },
+    { key:"softTissue", title:p.softTissue.title, color:p.softTissue.color, icon:p.softTissue.icon },
+    { key:"contrast", title:p.contrast.title, color:p.contrast.color, icon:p.contrast.icon },
+    { key:"nutrition", title:p.nutrition.title, color:p.nutrition.color, icon:p.nutrition.icon },
+    { key:"sleep", title:p.sleep.title, color:p.sleep.color, icon:p.sleep.icon },
+  ];
+  return (
+    <div className="px-4 pt-4 pb-24">
+      <div className="text-3xl tracking-wide mb-1" style={{ color:"#06d6a0" }}>ZONE 2 + RECOVERY</div>
+      <div className="body-text text-white/40 text-sm mb-4">Wednesday - Your body rebuilds today. Earn Thursday's deadlifts.</div>
+      <div className="p-4 rounded-2xl mb-4" style={{ background:"linear-gradient(135deg,#06d6a015,#06d6a005)",border:"1px solid #06d6a030" }}>
+        <div className="text-xl tracking-wide mb-2" style={{ color:"#06d6a0" }}>THE BIG PICTURE</div>
+        <div className="body-text text-white/60 text-sm leading-relaxed">Wednesday is not a rest day — it's an <span style={{ color:"#06d6a0" }}>active recovery day</span>. Zone 2 cardio + mobility + soft tissue work compounds over weeks. This is how you stay injury-free and hit PRs on Thursday.</div>
+      </div>
+      {sections.map(sec => {
+        const isOpen = openSection === sec.key;
+        return (
+          <div key={sec.key} className="mb-3 rounded-2xl overflow-hidden" style={{ border:`1px solid ${sec.color}30` }}>
+            <button onClick={() => toggle(sec.key)} className="w-full p-4 flex items-center justify-between set-btn" style={{ background:"#111" }}>
+              <div className="flex items-center gap-3">
+                <span style={{ fontSize:20 }}>{sec.icon}</span>
+                <div style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:20,color:sec.color }}>{sec.title}</div>
+              </div>
+              <span className="body-text text-white/30 text-sm">{isOpen?"▲":"▼"}</span>
+            </button>
+            {isOpen && (
+              <div className="px-4 pb-4 pt-2" style={{ background:"#0a0a0a",borderTop:`1px solid ${sec.color}15` }}>
+                {sec.key === "zone2" && (
+                  <>
+                    <div className="body-text text-white/40 text-xs leading-relaxed mb-4">Run, bike, row, or elliptical. <span style={{ color:"#06d6a0" }}>Nasal breathing test:</span> if you can't breathe only through your nose, slow down. That's the zone.</div>
+                    <div className="space-y-3">
+                      {p.zone2.phases.map((ph, i) => (
+                        <div key={i} className="flex items-start gap-3 p-3 rounded-xl" style={{ background:"#111",border:"1px solid #1e1e1e" }}>
+                          <div className="px-2 py-1 rounded-full text-xs body-text shrink-0" style={{ background:"#06d6a020",color:"#06d6a0" }}>{ph.phase}</div>
+                          <div>
+                            <div style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:18,color:"white" }}>{ph.duration}</div>
+                            <div className="body-text text-white/40 text-xs">{ph.note}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+                {sec.key === "mobility" && (
+                  <>
+                    <div className="body-text text-white/40 text-xs mb-4">{p.mobility.note}</div>
+                    <div className="space-y-3">
+                      {p.mobility.exercises.map((ex, i) => {
+                        const timerVal = mobilityTimers[i];
+                        const isRunning = timerVal > 0;
+                        const isDone = timerVal === 0 && timerVal !== undefined;
+                        return (
+                          <div key={i} className="p-3 rounded-xl" style={{ background:"#111",border:`1px solid ${isDone?"#ffd16640":"#1e1e1e"}` }}>
+                            <div className="flex justify-between items-start mb-1">
+                              <div style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:isDone?"#ffd166":"white" }}>{ex.name}</div>
+                              <span className="body-text text-xs shrink-0 ml-2" style={{ color:"#ffd166" }}>{ex.dur}</span>
+                            </div>
+                            <div className="body-text text-white/50 text-xs mb-1">{ex.cue}</div>
+                            <div className="body-text text-white/25 text-xs mb-2">Benefit: {ex.benefit}</div>
+                            {isRunning ? (
+                              <span style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:20,color:"#ffd166" }}>
+                                {Math.floor(timerVal/60)}:{String(timerVal%60).padStart(2,"0")}
+                              </span>
+                            ) : (
+                              <button onClick={() => startMobilityTimer(i, 60)} className="set-btn body-text text-xs px-3 py-1.5 rounded-lg" style={{ background:isDone?"#ffd16620":"rgba(255,255,255,0.05)",color:isDone?"#ffd166":"rgba(255,255,255,0.3)",border:`1px solid ${isDone?"#ffd16640":"rgba(255,255,255,0.1)"}` }}>
+                                {isDone ? "✓ Done" : "▶ Timer"}
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+                {sec.key === "softTissue" && (
+                  <>
+                    <div className="body-text text-white/40 text-xs mb-4">{p.softTissue.note}</div>
+                    <div className="space-y-2">
+                      {p.softTissue.targets.map((t, i) => (
+                        <div key={i} className="p-3 rounded-xl flex items-start gap-3" style={{ background:"#111",border:"1px solid #1e1e1e" }}>
+                          <button onClick={() => checkItem(`soft-${i}`)} className="set-btn shrink-0 mt-0.5 w-5 h-5 rounded-md flex items-center justify-center text-xs" style={{ background:checkedItems[`soft-${i}`]?"#ff9f47":"#222",border:`1px solid ${checkedItems[`soft-${i}`]?"#ff9f47":"#444"}`,color:"#000" }}>
+                            {checkedItems[`soft-${i}`]?"✓":""}
+                          </button>
+                          <div>
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <div style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:15,color:checkedItems[`soft-${i}`]?"#ff9f47":"white" }}>{t.area}</div>
+                              <span className="body-text text-xs px-1.5 py-0.5 rounded-full" style={{ background:t.priority.startsWith("HIGH")?"#ff4444":"#ff9f47",color:"#000",fontSize:9 }}>{t.priority}</span>
+                            </div>
+                            <div className="body-text text-white/40 text-xs">{t.cue}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+                {sec.key === "contrast" && (
+                  <>
+                    <div className="body-text text-white/40 text-xs mb-4">{p.contrast.note}</div>
+                    <div className="space-y-3">
+                      {p.contrast.steps.map((s, i) => (
+                        <div key={i} className="flex items-start gap-3 p-3 rounded-xl" style={{ background:"#111",border:"1px solid #1e1e1e" }}>
+                          <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-sm font-bold body-text" style={{ background:"#47c8ff20",color:"#47c8ff",border:"1px solid #47c8ff40" }}>{i+1}</div>
+                          <div>
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <div style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#47c8ff" }}>{s.label}</div>
+                              <span className="body-text text-xs" style={{ color:"rgba(255,255,255,0.3)" }}>{s.duration}</span>
+                            </div>
+                            <div className="body-text text-white/40 text-xs">{s.note}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+                {sec.key === "nutrition" && (
+                  <>
+                    <div className="body-text text-white/40 text-xs mb-4">{p.nutrition.note}</div>
+                    <div className="space-y-2">
+                      {p.nutrition.items.map((item, i) => (
+                        <div key={i} className="p-3 rounded-xl" style={{ background:"#111",border:"1px solid #1e1e1e" }}>
+                          <div className="flex justify-between items-center mb-0.5">
+                            <div style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:16,color:"#c47bff" }}>{item.label}</div>
+                            <span className="body-text text-xs px-2 py-0.5 rounded-full" style={{ background:"#c47bff20",color:"#c47bff" }}>{item.target}</span>
+                          </div>
+                          <div className="body-text text-white/40 text-xs">{item.note}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+                {sec.key === "sleep" && (
+                  <>
+                    <div className="body-text text-white/40 text-xs mb-4">{p.sleep.note}</div>
+                    <div className="space-y-2">
+                      {p.sleep.tips.map((tip, i) => (
+                        <div key={i} className="flex items-start gap-3 p-3 rounded-xl" style={{ background:"#111",border:"1px solid #1e1e1e" }}>
+                          <div className="w-2 h-2 rounded-full mt-1.5 shrink-0" style={{ background:"#4ade80" }}/>
+                          <div className="body-text text-white/60 text-sm">{tip}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── PROTEIN TAB ──
 function ProteinTab() {
   const [entries,setEntries]=useState(()=>ls("protein_entries",{}));
   const [manualG,setManualG]=useState(""),[manualName,setManualName]=useState(""),[view,setView]=useState("today");
   const [editingId,setEditingId]=useState(null);
   const [editG,setEditG]=useState(""),[editName,setEditName]=useState("");
   const [expandedHistoryDay,setExpandedHistoryDay]=useState(null);
-
   const todayKey=getLocalDateKey();
   const todayEntries=entries[todayKey]||[];
   const todayTotal=todayEntries.reduce((s,e)=>s+e.protein,0);
   const pct=Math.min(100,(todayTotal/PROTEIN_GOAL)*100);
   const saveEntries=u=>{ setEntries(u); lsSet("protein_entries",u); };
-
   const addEntry=(name,protein)=>{
     const entry={ id:Date.now(),name,protein,time:new Date().toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}) };
     saveEntries({ ...entries,[todayKey]:[...(entries[todayKey]||[]),entry] });
   };
   const addManual=()=>{ const g=parseInt(manualG); if(!g||g<=0)return; addEntry(manualName.trim()||"Custom food",g); setManualG("");setManualName(""); };
-
   const deleteEntry=(dateKey,id)=>saveEntries({ ...entries,[dateKey]:(entries[dateKey]||[]).filter(e=>e.id!==id) });
-
   const startEdit=(entry)=>{ setEditingId(entry.id); setEditG(String(entry.protein)); setEditName(entry.name); };
   const saveEdit=(dateKey)=>{
     const g=parseInt(editG);
@@ -463,10 +723,8 @@ function ProteinTab() {
     setEditingId(null);
   };
   const cancelEdit=()=>setEditingId(null);
-
   const streak=calcProteinStreak(entries);
   const barColor=pct>=100?"#4ade80":pct>=70?"#e8ff47":"#47c8ff";
-
   const last7=Array.from({length:7},(_,i)=>{
     const d=new Date(); d.setDate(d.getDate()-i);
     const key=getLocalDateKey(d);
@@ -475,7 +733,6 @@ function ProteinTab() {
     const total=dayEntries.reduce((s,e)=>s+e.protein,0);
     return {key,label,total,dayEntries};
   });
-
   const EntryRow = ({ entry, dateKey, color }) => {
     const isEditing = editingId === entry.id;
     if (isEditing) {
@@ -484,13 +741,11 @@ function ProteinTab() {
           <div className="flex gap-2 mb-2">
             <div style={{ flex:2 }}>
               <div className="body-text text-white/30 text-xs mb-1">Food name</div>
-              <input type="text" value={editName} onChange={e=>setEditName(e.target.value)}
-                style={{ background:"#111",border:"1px solid #444",color:"white",borderRadius:8,padding:"8px 10px",fontFamily:"'DM Sans',sans-serif",fontSize:13,width:"100%",boxSizing:"border-box" }}/>
+              <input type="text" value={editName} onChange={e=>setEditName(e.target.value)} style={{ background:"#111",border:"1px solid #444",color:"white",borderRadius:8,padding:"8px 10px",fontFamily:"'DM Sans',sans-serif",fontSize:13,width:"100%",boxSizing:"border-box" }}/>
             </div>
             <div style={{ width:72 }}>
               <div className="body-text text-white/30 text-xs mb-1">Grams</div>
-              <input type="number" value={editG} onChange={e=>setEditG(e.target.value)}
-                style={{ background:"#111",border:"1px solid #444",color:"white",borderRadius:8,padding:"8px 10px",fontFamily:"'DM Sans',sans-serif",fontSize:13,width:"100%",boxSizing:"border-box" }}/>
+              <input type="number" value={editG} onChange={e=>setEditG(e.target.value)} style={{ background:"#111",border:"1px solid #444",color:"white",borderRadius:8,padding:"8px 10px",fontFamily:"'DM Sans',sans-serif",fontSize:13,width:"100%",boxSizing:"border-box" }}/>
             </div>
           </div>
           <div className="flex gap-2">
@@ -514,13 +769,12 @@ function ProteinTab() {
       </div>
     );
   };
-
   return (
     <div className="px-4 pt-4 pb-24">
       <div className="flex justify-between items-center mb-4">
         <div>
           <div className="text-3xl tracking-wide">PROTEIN</div>
-          {streak>0&&<div className="body-text text-xs mt-0.5" style={{ color:"#4ade80" }}>fire {streak} day streak</div>}
+          {streak>0&&<div className="body-text text-xs mt-0.5" style={{ color:"#4ade80" }}>🔥 {streak} day streak</div>}
         </div>
         <div className="flex gap-1">
           {["today","history"].map(v=>(
@@ -559,27 +813,23 @@ function ProteinTab() {
           <div className="flex gap-2 mb-3">
             <div style={{ flex:2 }}>
               <div className="body-text text-white/30 text-xs mb-1">Food name (optional)</div>
-              <input type="text" placeholder="e.g. Chicken breast" value={manualName} onChange={e=>setManualName(e.target.value)}
-                style={{ background:"#1a1a1a",border:"1px solid #333",color:"white",borderRadius:10,padding:"10px 12px",fontFamily:"'DM Sans',sans-serif",fontSize:14,width:"100%",boxSizing:"border-box" }}/>
+              <input type="text" placeholder="e.g. Chicken breast" value={manualName} onChange={e=>setManualName(e.target.value)} style={{ background:"#1a1a1a",border:"1px solid #333",color:"white",borderRadius:10,padding:"10px 12px",fontFamily:"'DM Sans',sans-serif",fontSize:14,width:"100%",boxSizing:"border-box" }}/>
             </div>
             <div style={{ width:80 }}>
               <div className="body-text text-white/30 text-xs mb-1">Protein (g)</div>
-              <input type="number" placeholder="40" value={manualG} onChange={e=>setManualG(e.target.value)}
-                style={{ background:"#1a1a1a",border:"1px solid #333",color:"white",borderRadius:10,padding:"10px 12px",fontFamily:"'DM Sans',sans-serif",fontSize:14,width:"100%",boxSizing:"border-box" }}/>
+              <input type="number" placeholder="40" value={manualG} onChange={e=>setManualG(e.target.value)} style={{ background:"#1a1a1a",border:"1px solid #333",color:"white",borderRadius:10,padding:"10px 12px",fontFamily:"'DM Sans',sans-serif",fontSize:14,width:"100%",boxSizing:"border-box" }}/>
             </div>
           </div>
           <button onClick={addManual} className="set-btn body-text text-sm font-semibold w-full py-2.5 rounded-xl" style={{ background:"#47c8ff",color:"#000" }}>+ Add to Today</button>
         </div>
         {todayEntries.length>0&&<>
           <div className="text-xl tracking-wide mb-2">TODAY'S LOG <span className="body-text text-xs text-white/30 normal-case font-normal">tap edit to fix entries</span></div>
-          {[...todayEntries].reverse().map(entry=>(
-            <EntryRow key={entry.id} entry={entry} dateKey={todayKey} color="#47c8ff"/>
-          ))}
+          {[...todayEntries].reverse().map(entry=>(<EntryRow key={entry.id} entry={entry} dateKey={todayKey} color="#47c8ff"/>))}
         </>}
         {todayEntries.length===0&&<div className="body-text text-white/20 text-sm text-center py-8">Nothing logged yet today.</div>}
       </>}
       {view==="history"&&<>
-        <div className="text-xl tracking-wide mb-3">LAST 7 DAYS <span className="body-text text-xs text-white/30 normal-case font-normal">tap a day to edit</span></div>
+        <div className="text-xl tracking-wide mb-3">LAST 7 DAYS</div>
         <div className="space-y-2">
           {last7.map(({key,label,total,dayEntries})=>{
             const p=Math.min(100,(total/PROTEIN_GOAL)*100);
@@ -607,11 +857,7 @@ function ProteinTab() {
                     {dayEntries.length===0?(
                       <div className="body-text text-white/20 text-xs text-center py-3">No entries for this day.</div>
                     ):(
-                      <div className="pt-2">
-                        {[...dayEntries].reverse().map(entry=>(
-                          <EntryRow key={entry.id} entry={entry} dateKey={key} color={c==="#333"?"#47c8ff":c}/>
-                        ))}
-                      </div>
+                      <div className="pt-2">{[...dayEntries].reverse().map(entry=>(<EntryRow key={entry.id} entry={entry} dateKey={key} color={c==="#333"?"#47c8ff":c}/>))}</div>
                     )}
                   </div>
                 )}
@@ -621,14 +867,14 @@ function ProteinTab() {
         </div>
         <div className="mt-4 p-4 rounded-2xl" style={{ background:"#111",border:"1px solid #e8ff4725" }}>
           <div className="text-xl tracking-wide mb-1" style={{ color:"#e8ff47" }}>YOUR GOAL</div>
-          <div className="body-text text-white/60 text-sm"><span style={{ color:"#47c8ff",fontFamily:"'Bebas Neue',sans-serif",fontSize:20 }}>155g/day</span> - InBody: 140 lb lean mass x 1.1g/lb.</div>
+          <div className="body-text text-white/60 text-sm"><span style={{ color:"#47c8ff",fontFamily:"'Bebas Neue',sans-serif",fontSize:20 }}>155g/day</span> — InBody: 140 lb lean mass x 1.1g/lb.</div>
         </div>
       </>}
     </div>
   );
 }
 
-// ── BODY SCAN TAB (single version) ──
+// ── BODY SCAN TAB ──
 function BodyScanTab({ onBwChange }) {
   const [scans,setScans]=useState(()=>ls("body_scans",[]));
   const [form,setForm]=useState({date:"",weight:"",muscle:"",fat:"",bodyfat:"",age:""});
@@ -744,7 +990,7 @@ function BodyScanTab({ onBwChange }) {
   );
 }
 
-// ── VOLUME TAB (single version) ──
+// ── VOLUME TAB ──
 function VolumeTab({ setLog }) {
   const getWeekStart=()=>{
     const now=new Date(), day=now.getDay();
@@ -772,7 +1018,7 @@ function VolumeTab({ setLog }) {
               const color=MUSCLE_COLORS[muscle]||"#888";
               const rec=RECOMMENDED_SETS[muscle]||10;
               const pct=Math.min(100,(sets/rec)*100);
-              const status=sets>=rec?"check":sets>=(rec*0.7)?"~":"up";
+              const status=sets>=rec?"✓":sets>=(rec*0.7)?"~":"↑";
               const statusColor=sets>=rec?"#4ade80":sets>=(rec*0.7)?"#e8ff47":"#ff6b35";
               return (
                 <div key={muscle} className="p-3 rounded-xl" style={{ background:"#111",border:`1px solid ${color}20` }}>
@@ -793,26 +1039,27 @@ function VolumeTab({ setLog }) {
           {notHit.length>0&&(
             <div className="p-3 rounded-xl mb-4" style={{ background:"#111",border:"1px solid #ff6b3520" }}>
               <div className="body-text text-xs text-white/40 mb-1">NOT HIT YET THIS WEEK</div>
-              <div className="body-text text-xs" style={{ color:"#ff6b35" }}>{notHit.join(" - ")}</div>
+              <div className="body-text text-xs" style={{ color:"#ff6b35" }}>{notHit.join(" · ")}</div>
             </div>
           )}
         </>
       )}
       <div className="p-4 rounded-2xl" style={{ background:"#111",border:"1px solid #ffffff10" }}>
-        <div className="body-text text-white/30 text-xs leading-relaxed">check = at/above recommended - ~ = 70%+ - up = needs more volume. Weekly targets for natural lifters.</div>
+        <div className="body-text text-white/30 text-xs leading-relaxed">✓ = at/above recommended · ~ = 70%+ · ↑ = needs more volume. Weekly targets for natural lifters.</div>
       </div>
     </div>
   );
 }
 
-// ── NOTES TAB (single version) ──
+// ── NOTES TAB ──
 function NotesTab({ days }) {
+  const liftDays = days.filter(d => !d.isRecovery);
   const [notes,setNotes]=useState(()=>ls("session_notes",[]));
   const [selDay,setSelDay]=useState(0),[noteText,setNoteText]=useState(""),[rating,setRating]=useState(3);
   const saveNotes=n=>{ setNotes(n); lsSet("session_notes",n); };
   const addNote=()=>{
     if(!noteText.trim()) return;
-    const entry={ id:Date.now(),dayId:days[selDay].id,dayName:days[selDay].name.split("-")[0].trim(),dayColor:days[selDay].color,note:noteText.trim(),rating,date:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric"}),time:new Date().toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}) };
+    const entry={ id:Date.now(),dayId:liftDays[selDay].id,dayName:liftDays[selDay].name.split("-")[0].trim(),dayColor:liftDays[selDay].color,note:noteText.trim(),rating,date:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric"}),time:new Date().toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}) };
     saveNotes([entry,...notes]); setNoteText(""); setRating(3);
   };
   const deleteNote=id=>saveNotes(notes.filter(n=>n.id!==id));
@@ -824,7 +1071,7 @@ function NotesTab({ days }) {
       <div className="p-4 rounded-2xl mb-4" style={{ background:"#111",border:"1px solid #222" }}>
         <div className="text-xl tracking-wide mb-3">LOG TODAY</div>
         <div className="flex gap-2 mb-3 overflow-x-auto pb-1" style={{ scrollbarWidth:"none" }}>
-          {days.map((d,i)=>(
+          {liftDays.map((d,i)=>(
             <button key={i} onClick={()=>setSelDay(i)} className="set-btn body-text text-xs px-3 py-1.5 rounded-full font-medium whitespace-nowrap"
               style={{ background:selDay===i?d.color+"20":"transparent",color:selDay===i?d.color:"#555",border:`1px solid ${selDay===i?d.color:"#333"}` }}>
               {d.id} - {d.label}
@@ -835,15 +1082,15 @@ function NotesTab({ days }) {
         <div className="flex gap-2 mb-3">
           {[1,2,3,4,5].map(r=>(
             <button key={r} onClick={()=>setRating(r)} className="set-btn flex-1 py-2 rounded-xl text-center"
-              style={{ background:rating===r?days[selDay].color+"30":"#1a1a1a",border:`1px solid ${rating===r?days[selDay].color:"#333"}` }}>
+              style={{ background:rating===r?liftDays[selDay].color+"30":"#1a1a1a",border:`1px solid ${rating===r?liftDays[selDay].color:"#333"}` }}>
               <div style={{ fontSize:16 }}>{ratingDisplay[r]}</div>
-              <div className="body-text text-xs mt-0.5" style={{ color:rating===r?days[selDay].color:"#555" }}>{ratingLabel[r]}</div>
+              <div className="body-text text-xs mt-0.5" style={{ color:rating===r?liftDays[selDay].color:"#555" }}>{ratingLabel[r]}</div>
             </button>
           ))}
         </div>
         <textarea value={noteText} onChange={e=>setNoteText(e.target.value)} placeholder="How did it feel? PR attempts? Anything to remember next time..." rows={3}
           style={{ background:"#1a1a1a",border:"1px solid #333",color:"white",borderRadius:10,padding:"10px 12px",fontFamily:"'DM Sans',sans-serif",fontSize:14,width:"100%",boxSizing:"border-box",resize:"none",marginBottom:12 }}/>
-        <button onClick={addNote} className="set-btn body-text text-sm font-semibold w-full py-2.5 rounded-xl" style={{ background:days[selDay].color,color:"#000" }}>Save Note</button>
+        <button onClick={addNote} className="set-btn body-text text-sm font-semibold w-full py-2.5 rounded-xl" style={{ background:liftDays[selDay].color,color:"#000" }}>Save Note</button>
       </div>
       {notes.length===0?(
         <div className="body-text text-white/20 text-sm text-center py-8">No notes yet. Log after each session.</div>
@@ -889,12 +1136,12 @@ const YOGA_EVENING = {
   subtitle:"30 min before bed. Replaces scrolling.",
   note:"This is your nervous system OFF switch. Every pose should feel like a release not a fight. Combine with your magnesium glycinate.",
   poses:[
-    { name:"Jefferson Curl", dur:"60 sec slow", hold:60, important:true, cue:"Stand holding 10-15 lb plate. Slowly curl spine DOWN starting from head — chin to chest, upper back, then lower back. Reach toward floor. Hold 3 sec. Slowly reverse vertebra by vertebra. This is NOT fast.", benefit:"THE most powerful lower back mobility exercise. Decompresses every disc. Will change your back in 4 weeks.", prog:"Add 2.5 lb over weeks. Add step height when comfortable. Look it up on YouTube first — form matters." },
-    { name:"Pigeon Pose (each side)", dur:"90 sec each", hold:90, cue:"From downdog, bring one knee forward behind wrist. Extend back leg. Lower hips toward floor. Walk hands forward, rest forearms down. Breathe. Don't fight it.", benefit:"Deep hip opener. Most effective for squat depth and umpiring hip tightness.", prog:"Work toward full hip contact with floor." },
+    { name:"Jefferson Curl", dur:"60 sec slow", hold:60, important:true, cue:"Stand holding 10-15 lb plate. Slowly curl spine DOWN starting from head — chin to chest, upper back, then lower back. Reach toward floor. Hold 3 sec. Slowly reverse vertebra by vertebra.", benefit:"THE most powerful lower back mobility exercise. Decompresses every disc. Will change your back in 4 weeks.", prog:"Add 2.5 lb over weeks. Look it up on YouTube first — form matters." },
+    { name:"Pigeon Pose (each side)", dur:"90 sec each", hold:90, cue:"From downdog, bring one knee forward behind wrist. Extend back leg. Lower hips toward floor. Walk hands forward, rest forearms down. Breathe.", benefit:"Deep hip opener. Most effective for squat depth and umpiring hip tightness.", prog:"Work toward full hip contact with floor." },
     { name:"Standing Hamstring Stretch (each leg)", dur:"60 sec each", hold:60, cue:"Heel on a surface (chair, bench). Leg straight. Hinge forward from hips with flat back. Hold. Breathe out into the stretch. No bouncing.", benefit:"Specific hamstring length — directly builds toward touching toes.", prog:"Raise surface height as flexibility improves." },
     { name:"Lizard Pose (each side)", dur:"60 sec each", hold:60, cue:"Step foot outside same-side hand in a lunge. Both hands inside front foot. Back knee down. Sink hips. Lower forearms for deeper version.", benefit:"Opens hip flexors AND inner groin. Huge for squat depth.", prog:"Forearms to floor when ready, then foot further forward." },
     { name:"Wide-Leg Forward Fold", dur:"90 sec", hold:90, cue:"Sit with legs in a wide V. Walk hands forward between legs. Hinge from hips. Let gravity pull you. Breathe and sink — don't force.", benefit:"Inner thigh + hamstring. Foundation for front splits.", prog:"Track how close your chest gets to floor each week." },
-    { name:"Legs Up The Wall", dur:"2 min", hold:120, cue:"Lie on back, scoot close to wall, legs straight up. Arms relaxed. Breathe. Close your eyes. This is your wind-down signal.", benefit:"Passive hamstring stretch. Drains lactic acid. Calms nervous system for sleep.", prog:"Build toward 3-5 min over weeks." },
+    { name:"Legs Up The Wall", dur:"2 min", hold:120, cue:"Lie on back, scoot close to wall, legs straight up. Arms relaxed. Breathe. Close your eyes.", benefit:"Passive hamstring stretch. Drains lactic acid. Calms nervous system for sleep.", prog:"Build toward 3-5 min over weeks." },
     { name:"Supine Spinal Twist (each side)", dur:"45 sec each", hold:45, cue:"Lie on back. Hug both knees to chest, let them fall to one side. Arms out. Look opposite direction. Breathe into lower back.", benefit:"Final lower back release. Sets spine neutral for sleep.", prog:"Add neck rotation in same direction as knees." },
   ]
 };
@@ -1008,7 +1255,6 @@ export default function App() {
   useEffect(()=>{ sessionStorage.setItem("tab",activeTab); },[activeTab]);
   useEffect(()=>{ sessionStorage.setItem("day",String(activeDay)); },[activeDay]);
   useEffect(()=>{ sessionStorage.setItem("completedSets",JSON.stringify(completedSets)); },[completedSets]);
-
   useEffect(()=>{
     const iv=setInterval(()=>{ const pe=ls("protein_entries",null); if(pe) setProteinEntries(pe); },3000);
     return ()=>clearInterval(iv);
@@ -1027,6 +1273,7 @@ export default function App() {
 
   const startTimer=category=>{
     const d=days[activeDay], isC=COMPOUND_CATS.includes(category);
+    if(d.isRecovery) return;
     setTimer({duration:isC?d.timing.compound_rest:d.timing.accessory_rest,label:isC?"COMPOUND":"ACCESSORY",color:d.color,key:Date.now()});
   };
 
@@ -1071,7 +1318,7 @@ export default function App() {
   const resetSets=()=>{ setCompletedSets({}); sessionStorage.removeItem("completedSets"); };
   const deleteLogEntry=id=>saveLog(setLog.filter(e=>e.id!==id));
   const parseSetCount=s=>{ const m=s.match(/^(\d+)/); return m?parseInt(m[1]):3; };
-  const fmtSecs=s=>`${Math.floor(s/60)}:${(s%60).toString().padStart(2,"0")}`;
+  const fmtSecs=s=>s===0?"—":`${Math.floor(s/60)}:${(s%60).toString().padStart(2,"0")}`;
 
   const bench=getMax("bench"),squat=getMax("squat"),deadlift=getMax("deadlift");
   const total=(bench?.weight||0)+(squat?.weight||0)+(deadlift?.weight||0);
@@ -1085,12 +1332,10 @@ export default function App() {
   const showDeload=sessionDays.size>=16&&deloadDismissed!==thisMonth;
 
   const day=days[activeDay];
-  const warmup=WARMUPS[day.id];
+  const warmup=WARMUPS[day.warmupKey || day.id] || WARMUPS.A;
 
   const tabs=["home","program","protein","volume","notes","scan","logs","prs","nutrition","bag","yoga"];
   const tabLabels={home:"Home",program:"Program",protein:"Protein",volume:"Volume",notes:"Notes",scan:"Body Scan",logs:"Logs",prs:"PRs",nutrition:"Food",bag:"Bag",yoga:"Yoga"};
-  const uniqueExNames=[...new Set(setLog.map(e=>e.exName))];
-  const filteredLog=logFilter==="all"?setLog:setLog.filter(e=>e.exName===logFilter);
 
   return (
     <div style={{ fontFamily:"'Bebas Neue','Arial Narrow',sans-serif" }} className="min-h-screen bg-black text-white">
@@ -1116,12 +1361,12 @@ export default function App() {
         <div className="flex justify-between items-start mb-3">
           <div>
             <h1 className="text-4xl leading-none tracking-wide" style={{ color:"#e8ff47" }}>1000LB CLUB</h1>
-            <div className="body-text text-white/40 text-xs mt-1">{latestScanAge?`Age ${latestScanAge}`:"17yo"} - {bw}lb - Summer 2026</div>
+            <div className="body-text text-white/40 text-xs mt-1">{latestScanAge?`Age ${latestScanAge}`:"17yo"} — {bw}lb — Summer 2026</div>
           </div>
           <div className="text-right">
             <div className="body-text text-white/30 text-xs">Club total</div>
             <div className="text-2xl tracking-wide" style={{ color:total>=1000?"#4ade80":"#e8ff47" }}>{total>0?`${total} lb`:"--"}</div>
-            <div className="body-text text-white/30 text-xs">{total>=1000?"MEMBER trophy":total>0?`${1000-total} to go`:"Log PRs to track"}</div>
+            <div className="body-text text-white/30 text-xs">{total>=1000?"MEMBER 🏆":total>0?`${1000-total} to go`:"Log PRs to track"}</div>
           </div>
         </div>
         <div className="grid grid-cols-3 gap-2 mb-2">
@@ -1176,6 +1421,7 @@ export default function App() {
         ))}
       </div>
 
+      {/* HOME TAB */}
       {activeTab==="home"&&(
         <div className="px-4 pt-4 pb-24">
           <div className="p-4 rounded-2xl mb-4" style={{ background:"#111",border:"1px solid #e8ff4730" }}>
@@ -1201,11 +1447,13 @@ export default function App() {
           })()}
           <div className="text-xl tracking-wide mb-3">THIS WEEK</div>
           <div className="grid grid-cols-2 gap-2 mb-5">
-            {WEEK_SCHEDULE.slice(0,6).map((s,i)=>(
+            {WEEK_SCHEDULE.filter(s=>s.type!=="rest").map((s,i)=>(
               <div key={i} className="p-3 rounded-xl" style={{ background:"#111",border:`1px solid ${s.color}30` }}>
-                <div className="body-text text-white/40 text-xs">{s.day} - {s.work}</div>
+                <div className="body-text text-white/40 text-xs">{s.day} — {s.work}</div>
                 <div className="text-lg tracking-wide mt-1" style={{ color:s.color }}>{s.label}</div>
-                <button onClick={()=>{ setActiveDay(s.dayIdx); setActiveTab("program"); }} className="set-btn body-text text-xs mt-2 px-3 py-1 rounded-full" style={{ background:s.color+"20",color:s.color,border:`1px solid ${s.color}40` }}>Open</button>
+                {s.type!=="rest"&&s.dayIdx!==undefined&&(
+                  <button onClick={()=>{ setActiveDay(s.dayIdx); setActiveTab("program"); }} className="set-btn body-text text-xs mt-2 px-3 py-1 rounded-full" style={{ background:s.color+"20",color:s.color,border:`1px solid ${s.color}40` }}>Open</button>
+                )}
               </div>
             ))}
           </div>
@@ -1216,7 +1464,7 @@ export default function App() {
                 <div key={i} className="flex items-center justify-between p-3 rounded-xl" style={{ background:"#111",border:"1px solid #222" }}>
                   <div>
                     <div className="body-text text-white text-sm font-medium">{e.exName}</div>
-                    <div className="body-text text-xs" style={{ color:"rgba(255,255,255,0.3)" }}>{e.date} - {e.time}</div>
+                    <div className="body-text text-xs" style={{ color:"rgba(255,255,255,0.3)" }}>{e.date} — {e.time}</div>
                   </div>
                   <div className="text-right">
                     <div className="text-lg tracking-wide" style={{ color:e.dayColor }}>{e.weight?`${e.weight} lb`:"--"}</div>
@@ -1229,90 +1477,104 @@ export default function App() {
         </div>
       )}
 
+      {/* PROGRAM TAB */}
       {activeTab==="program"&&(
         <div>
-          <div className="mx-4 mt-4 p-3 rounded-xl" style={{ background:`linear-gradient(135deg,${warmup.color}20,${warmup.color}08)`,border:`1px solid ${warmup.color}40` }}>
-            <div className="text-sm tracking-widest mb-0.5" style={{ color:warmup.color }}>WARMUP - {warmup.label}</div>
-            <div className="body-text text-white/30 text-xs mb-2">{warmup.note}</div>
-            <div className="space-y-2">
-              {warmup.exercises.map((ex,i)=>(
-                <div key={i}>
-                  <div className="flex justify-between">
-                    <div className="body-text text-white text-xs font-medium">{ex.name}</div>
-                    <div className="body-text text-white/40 text-xs">{ex.sets}</div>
-                  </div>
-                  <div className="body-text text-white/30 text-xs">{ex.note}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Day selector */}
           <div className="px-4 mt-4">
-            <div className="grid grid-cols-6 gap-2 mb-4">
+            <div className="grid grid-cols-6 gap-1.5 mb-4">
               {days.map((d,i)=>(
-                <button key={i} onClick={()=>setActiveDay(i)} className="set-btn py-3 rounded-xl text-center"
-                  style={{ background:activeDay===i?d.color:"#111",border:`1px solid ${activeDay===i?d.color:"#222"}`,color:activeDay===i?"#000":"#666" }}>
-                  <div className="text-lg font-bold" style={{ fontFamily:"'Bebas Neue',sans-serif" }}>{d.id}</div>
-                  <div className="body-text text-xs font-medium">{d.label.replace("DAY ","D")}</div>
+                <button key={i} onClick={()=>setActiveDay(i)} className="set-btn py-2 rounded-xl text-center"
+                  style={{ background:activeDay===i?d.color:"#111",border:`1px solid ${activeDay===i?d.color:"#222"}`,color:activeDay===i?"#000":"#555" }}>
+                  <div className="text-lg" style={{ fontFamily:"'Bebas Neue',sans-serif",lineHeight:1 }}>{d.id}</div>
+                  <div className="body-text" style={{ fontSize:9,fontWeight:500,lineHeight:1.2 }}>{d.label}</div>
                 </button>
               ))}
             </div>
-            <div className="text-3xl tracking-wide" style={{ color:day.color }}>{day.name.split("-")[0].trim()}</div>
-            <div className="body-text text-white/40 text-sm mb-3">{day.tag}</div>
-            <div className="flex gap-2 flex-wrap mb-2">
-              <div className="flex items-center gap-2 flex-1">
-                <div className="body-text text-xs px-3 py-1.5 rounded-full" style={{ background:day.color+"20",color:day.color,border:`1px solid ${day.color}40` }}>{fmtSecs(day.timing.compound_rest)} compound</div>
-                <div className="body-text text-xs px-3 py-1.5 rounded-full" style={{ background:"#ffffff10",color:"rgba(255,255,255,0.4)",border:"1px solid rgba(255,255,255,0.1)" }}>{fmtSecs(day.timing.accessory_rest)} acc</div>
-              </div>
-              <div className="flex gap-2">
-                <button onClick={()=>setShowRename(true)} className="set-btn body-text text-xs px-3 py-1.5 rounded-full font-semibold" style={{ background:"#ffffff10",color:"rgba(255,255,255,0.5)",border:"1px solid rgba(255,255,255,0.15)" }}>Rename</button>
-                <button onClick={resetSets} className="set-btn body-text text-xs px-3 py-1.5 rounded-full font-semibold" style={{ background:"#ff444420",color:"#ff4444",border:"1px solid #ff444440" }}>Reset</button>
-              </div>
-            </div>
-            <div className="body-text text-white/25 text-xs mb-4">Tap set - log weight and reps - rest timer starts</div>
-            <div className="space-y-3 pb-24">
-              {day.exercises.map((ex,exIdx)=>{
-                const cat=categoryColors[ex.category];
-                const setCount=parseSetCount(ex.sets);
-                const isCompound=COMPOUND_CATS.includes(ex.category);
-                const exLogs=setLog.filter(e=>e.exName===ex.name);
-                const bestLog=exLogs.length?exLogs.reduce((b,x)=>(x.est1rm||0)>(b.est1rm||0)?x:b,exLogs[0]):null;
-                return (
-                  <div key={exIdx} className={`rounded-2xl p-4 ${cat.bg}`} style={{ border:`1px solid ${ex.category==="ab"?"#4ade8030":ex.category==="neck"?"#a855f730":"rgba(255,255,255,0.07)"}` }}>
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className={`body-text text-xs px-2 py-0.5 rounded-full font-semibold ${cat.badge}`}>{cat.label}</span>
-                          {ex.altGroup&&<span className="body-text text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background:ex.altGroup==="bicep"?"#47c8ff20":"#e8ff4720",color:ex.altGroup==="bicep"?"#47c8ff":"#e8ff47" }}>{ex.altGroup==="bicep"?"BICEP":"TRICEP"}</span>}
-                          {ex.trackPR&&<span className="body-text text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background:"#e8ff4720",color:"#e8ff47" }}>PR</span>}
-                        </div>
-                        <div className="text-xl tracking-wide" style={{ fontFamily:"'Bebas Neue',sans-serif" }}>{ex.name}</div>
-                        {bestLog?.est1rm&&<div className="body-text text-xs mt-0.5" style={{ color:"rgba(255,255,255,0.3)" }}>Best est. 1RM: <span style={{ color:day.color }}>{bestLog.est1rm} lb</span></div>}
-                      </div>
-                      <div className="text-right shrink-0">
-                        <div className="text-lg" style={{ color:day.color,fontFamily:"'Bebas Neue',sans-serif" }}>{ex.sets}</div>
-                        <div className="body-text text-xs" style={{ color:isCompound?day.color+"99":"rgba(255,255,255,0.2)" }}>{fmtSecs(isCompound?day.timing.compound_rest:day.timing.accessory_rest)} rest</div>
-                      </div>
-                    </div>
-                    <div className="body-text text-white/40 text-xs mb-1">{ex.weight}</div>
-                    <div className="body-text text-white/55 text-xs leading-relaxed mb-3">{ex.note}</div>
-                    <div className="flex gap-2 flex-wrap">
-                      {Array.from({length:setCount}).map((_,si)=>{
-                        const k=`${activeDay}-${exIdx}-${si}`;
-                        const done=completedSets[k];
-                        return (
-                          <button key={si} onClick={()=>handleSetPress(exIdx,si,ex.name,ex.category)}
-                            className="set-btn body-text text-xs font-semibold px-3 py-1.5 rounded-lg"
-                            style={{ background:done?day.color:"rgba(255,255,255,0.05)",color:done?"#000":"rgba(255,255,255,0.3)",border:`1px solid ${done?day.color:"rgba(255,255,255,0.1)"}` }}>
-                            SET {si+1}{done?" check":""}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
           </div>
+
+          {/* Recovery day gets its own view */}
+          {day.isRecovery ? (
+            <RecoveryDayView day={day} />
+          ) : (
+            <>
+              {/* Warmup */}
+              <div className="mx-4 p-3 rounded-xl mb-4" style={{ background:`linear-gradient(135deg,${warmup.color}20,${warmup.color}08)`,border:`1px solid ${warmup.color}40` }}>
+                <div className="text-sm tracking-widest mb-0.5" style={{ color:warmup.color }}>WARMUP — {warmup.label}</div>
+                <div className="body-text text-white/30 text-xs mb-2">{warmup.note}</div>
+                <div className="space-y-2">
+                  {warmup.exercises.map((ex,i)=>(
+                    <div key={i}>
+                      <div className="flex justify-between">
+                        <div className="body-text text-white text-xs font-medium">{ex.name}</div>
+                        <div className="body-text text-white/40 text-xs">{ex.sets}</div>
+                      </div>
+                      <div className="body-text text-white/30 text-xs">{ex.note}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="px-4">
+                <div className="text-3xl tracking-wide" style={{ color:day.color }}>{day.name.split("-")[0].trim()}</div>
+                <div className="body-text text-white/40 text-sm mb-3">{day.tag}</div>
+                <div className="flex gap-2 flex-wrap mb-2">
+                  <div className="flex items-center gap-2 flex-1">
+                    <div className="body-text text-xs px-3 py-1.5 rounded-full" style={{ background:day.color+"20",color:day.color,border:`1px solid ${day.color}40` }}>{fmtSecs(day.timing.compound_rest)} compound</div>
+                    <div className="body-text text-xs px-3 py-1.5 rounded-full" style={{ background:"#ffffff10",color:"rgba(255,255,255,0.4)",border:"1px solid rgba(255,255,255,0.1)" }}>{fmtSecs(day.timing.accessory_rest)} acc</div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={()=>setShowRename(true)} className="set-btn body-text text-xs px-3 py-1.5 rounded-full font-semibold" style={{ background:"#ffffff10",color:"rgba(255,255,255,0.5)",border:"1px solid rgba(255,255,255,0.15)" }}>Rename</button>
+                    <button onClick={resetSets} className="set-btn body-text text-xs px-3 py-1.5 rounded-full font-semibold" style={{ background:"#ff444420",color:"#ff4444",border:"1px solid #ff444440" }}>Reset</button>
+                  </div>
+                </div>
+                <div className="body-text text-white/25 text-xs mb-4">Tap set → log weight and reps → rest timer starts</div>
+                <div className="space-y-3 pb-24">
+                  {day.exercises.map((ex,exIdx)=>{
+                    const cat=categoryColors[ex.category];
+                    const setCount=parseSetCount(ex.sets);
+                    const isCompound=COMPOUND_CATS.includes(ex.category);
+                    const exLogs=setLog.filter(e=>e.exName===ex.name);
+                    const bestLog=exLogs.length?exLogs.reduce((b,x)=>(x.est1rm||0)>(b.est1rm||0)?x:b,exLogs[0]):null;
+                    return (
+                      <div key={exIdx} className={`rounded-2xl p-4 ${cat.bg}`} style={{ border:`1px solid ${ex.category==="ab"?"#4ade8030":ex.category==="neck"?"#a855f730":"rgba(255,255,255,0.07)"}` }}>
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              <span className={`body-text text-xs px-2 py-0.5 rounded-full font-semibold ${cat.badge}`}>{cat.label}</span>
+                              {ex.altGroup&&<span className="body-text text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background:ex.altGroup==="bicep"?"#47c8ff20":"#e8ff4720",color:ex.altGroup==="bicep"?"#47c8ff":"#e8ff47" }}>{ex.altGroup==="bicep"?"BICEP":"TRICEP"}</span>}
+                              {ex.trackPR&&<span className="body-text text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background:"#e8ff4720",color:"#e8ff47" }}>PR</span>}
+                            </div>
+                            <div className="text-xl tracking-wide" style={{ fontFamily:"'Bebas Neue',sans-serif" }}>{ex.name}</div>
+                            {bestLog?.est1rm&&<div className="body-text text-xs mt-0.5" style={{ color:"rgba(255,255,255,0.3)" }}>Best est. 1RM: <span style={{ color:day.color }}>{bestLog.est1rm} lb</span></div>}
+                          </div>
+                          <div className="text-right shrink-0">
+                            <div className="text-lg" style={{ color:day.color,fontFamily:"'Bebas Neue',sans-serif" }}>{ex.sets}</div>
+                            <div className="body-text text-xs" style={{ color:isCompound?day.color+"99":"rgba(255,255,255,0.2)" }}>{fmtSecs(isCompound?day.timing.compound_rest:day.timing.accessory_rest)} rest</div>
+                          </div>
+                        </div>
+                        <div className="body-text text-white/40 text-xs mb-1">{ex.weight}</div>
+                        <div className="body-text text-white/55 text-xs leading-relaxed mb-3">{ex.note}</div>
+                        <div className="flex gap-2 flex-wrap">
+                          {Array.from({length:setCount}).map((_,si)=>{
+                            const k=`${activeDay}-${exIdx}-${si}`;
+                            const done=completedSets[k];
+                            return (
+                              <button key={si} onClick={()=>handleSetPress(exIdx,si,ex.name,ex.category)}
+                                className="set-btn body-text text-xs font-semibold px-3 py-1.5 rounded-lg"
+                                style={{ background:done?day.color:"rgba(255,255,255,0.05)",color:done?"#000":"rgba(255,255,255,0.3)",border:`1px solid ${done?day.color:"rgba(255,255,255,0.1)"}` }}>
+                                SET {si+1}{done?" ✓":""}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
 
@@ -1321,6 +1583,7 @@ export default function App() {
       {activeTab==="notes"&&<NotesTab days={days}/>}
       {activeTab==="scan"&&<BodyScanTab onBwChange={handleBwChange}/>}
 
+      {/* LOGS TAB */}
       {activeTab==="logs"&&(
         <div className="px-4 pt-4 pb-24">
           <div className="flex justify-between items-center mb-1">
@@ -1329,7 +1592,6 @@ export default function App() {
           </div>
           <div className="body-text text-white/40 text-sm mb-4">{setLog.length} sets logged total</div>
           {setLog.length===0?<div className="body-text text-white/20 text-sm text-center py-12">No sets logged yet.</div>:(()=>{
-            // Group by exercise
             const groups = {};
             setLog.forEach(entry=>{
               if(!groups[entry.exName]) groups[entry.exName]={ exName:entry.exName, dayColor:entry.dayColor, dayName:entry.dayName, entries:[] };
@@ -1350,7 +1612,7 @@ export default function App() {
                           <div className="flex items-center gap-2 mt-0.5">
                             <div className="body-text text-xs" style={{ color:group.dayColor+"cc" }}>{group.dayName}</div>
                             <div className="body-text text-xs text-white/30">{group.entries.length} set{group.entries.length!==1?"s":""}</div>
-                            {best?.est1rm&&<div className="body-text text-xs" style={{ color:"rgba(255,255,255,0.3)" }}>best ~{best.est1rm} est 1RM</div>}
+                            {best?.est1rm&&<div className="body-text text-xs" style={{ color:"rgba(255,255,255,0.3)" }}>best ~{best.est1rm} 1RM</div>}
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -1363,7 +1625,7 @@ export default function App() {
                           {group.entries.map(entry=>(
                             <div key={entry.id} className="flex items-center justify-between py-2 border-b" style={{ borderColor:"rgba(255,255,255,0.05)" }}>
                               <div>
-                                <div className="body-text text-white/70 text-xs">{entry.date} - {entry.time}</div>
+                                <div className="body-text text-white/70 text-xs">{entry.date} — {entry.time}</div>
                                 {entry.est1rm&&<div className="body-text text-xs" style={{ color:"rgba(255,255,255,0.3)" }}>~{entry.est1rm} est 1RM</div>}
                               </div>
                               <div className="flex items-center gap-3">
@@ -1386,6 +1648,7 @@ export default function App() {
         </div>
       )}
 
+      {/* PRs TAB */}
       {activeTab==="prs"&&(
         <div className="px-4 pt-4 pb-24">
           <div className="text-3xl tracking-wide mb-4">PR TRACKER</div>
@@ -1403,7 +1666,7 @@ export default function App() {
             <div className="p-4 rounded-2xl mb-4" style={{ background:"#111",border:`1px solid ${dotsRat.color}30` }}>
               <div className="flex justify-between items-center">
                 <div>
-                  <div className="body-text text-white/40 text-xs mb-0.5">DOTS SCORE - {bw} lb bodyweight</div>
+                  <div className="body-text text-white/40 text-xs mb-0.5">DOTS SCORE — {bw} lb bodyweight</div>
                   <div style={{ fontFamily:"'Bebas Neue',sans-serif",fontSize:36,color:dotsRat.color,lineHeight:1 }}>{dots}</div>
                 </div>
                 <div className="text-right">
@@ -1454,7 +1717,7 @@ export default function App() {
                       <div key={i} className="flex items-center justify-between p-3 rounded-xl" style={{ background:"#111",border:"1px solid #222" }}>
                         <div>
                           <div className="text-xl tracking-wide" style={{ color:lift.color }}>{e.weight} lb</div>
-                          <div className="body-text text-white/30 text-xs">{e.reps} rep{e.reps!==1?"s":""} - {e.date}</div>
+                          <div className="body-text text-white/30 text-xs">{e.reps} rep{e.reps!==1?"s":""} — {e.date}</div>
                           {e.reps>1&&<div className="body-text text-xs" style={{ color:"rgba(255,255,255,0.2)" }}>~{estimate1RM(e.weight,e.reps)} est 1RM</div>}
                         </div>
                         <button onClick={()=>deletePR(lift.key,entries.length-1-i)} className="set-btn body-text text-xs px-2 py-1 rounded-lg text-white/20 border border-white/10">x</button>
@@ -1468,6 +1731,7 @@ export default function App() {
         </div>
       )}
 
+      {/* NUTRITION TAB */}
       {activeTab==="nutrition"&&(
         <div className="px-4 pt-4 pb-24">
           <div className="text-3xl tracking-wide mb-5">NUTRITION</div>
@@ -1495,6 +1759,7 @@ export default function App() {
         </div>
       )}
 
+      {/* BAG TAB */}
       {activeTab==="bag"&&(
         <div className="px-4 pt-4 pb-24">
           <div className="flex justify-between items-center mb-4">
@@ -1536,6 +1801,7 @@ export default function App() {
         </div>
       )}
 
+      {/* YOGA TAB */}
       {activeTab==="yoga"&&(
         <div className="px-4 pt-4 pb-24">
           <div className="text-3xl tracking-wide mb-1">YOGA</div>
